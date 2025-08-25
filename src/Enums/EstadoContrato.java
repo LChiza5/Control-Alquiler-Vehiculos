@@ -9,5 +9,5 @@ package Enums;
  * @author ilope
  */
 public enum EstadoContrato {
-    
+    ACTIVO, FINALIZADO, CANCELADO
 }

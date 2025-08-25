@@ -9,5 +9,5 @@ package Enums;
  * @author ilope
  */
 public enum EstadoVehiculo {
-    
+    DISPONIBLE, EN_ALQUILER, EN_MANTENIMIENTO
 }

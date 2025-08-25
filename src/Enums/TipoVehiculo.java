@@ -9,5 +9,5 @@ package Enums;
  * @author ilope
  */
 public enum TipoVehiculo {
-    
+    SEDAN, SUV, PICK_UP
 }
