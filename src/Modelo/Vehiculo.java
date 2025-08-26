@@ -68,4 +68,12 @@ public class Vehiculo {
     public String toString(){ 
         return "Vehiculo{placa='%s', modelo='%s'}".formatted(placa,modelo); 
     }
+
+    public void setModelo(String modelo) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public void setTipo(TipoVehiculo tipo) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

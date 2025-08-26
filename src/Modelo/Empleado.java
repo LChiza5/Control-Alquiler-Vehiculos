@@ -31,6 +31,10 @@ public class Empleado extends Persona {
     public String getPuesto() {
         return puesto;
     }
+
+    public void setPuesto(String puesto) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     
 
 }

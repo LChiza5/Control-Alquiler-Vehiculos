@@ -13,49 +13,28 @@ import java.util.Queue;
  * @author ilope
  */
 public class reservaList implements List<Reserva> {
-    private final Queue<Reserva> espera = new LinkedList<>();
+     private final Queue<Reserva> espera = new LinkedList<>();
 
-    // List<T>
-    @Override
-    public boolean add(Reserva r) {
-        return espera.add(r); // encola al final
-    }
+  @Override
+  public boolean add(Reserva r) { return espera.add(r); }
 
-    @Override
-    public boolean remove(Reserva r) {
-        return espera.remove(r);
-    }
+  @Override
+  public boolean remove(Reserva r) { return espera.remove(r); }
 
-    @Override
-    public Reserva find(Object id) {
-        if (id == null) return null;
-        int _id;
-        try { _id = (id instanceof Integer) ? (Integer) id : Integer.parseInt(id.toString()); }
-        catch (NumberFormatException ex) { return null; }
+  @Override
+  public Reserva find(Object id) {
+    if (id == null) return null;
+    int n;
+    try { n = (id instanceof Integer) ? (Integer) id : Integer.parseInt(id.toString()); }
+    catch (NumberFormatException e){ return null; }
+    return espera.stream().filter(x -> x.getId() == n).findFirst().orElse(null);
+  }
 
-        return espera.stream()
-        .filter(res -> res.getId() == _id)
-        .findFirst()
-        .orElse(null);
-    }
+  @Override
+  public void showAll() { espera.forEach(System.out::println); }
 
-    @Override
-    public void showAll() {
-        espera.forEach(System.out::println);
-    }
-
-    // Métodos propios de cola
-    public Reserva siguiente() { // dequeue / poll
-        return espera.poll();
-    }
-
-    public boolean isVacia() {
-        return espera.isEmpty();
-    }
-
-    public int size() {
-        return espera.size();
-    }
-}
-    
-
+  // comportamiento de cola
+  public Reserva siguiente(){ return espera.poll(); }
+  public boolean isVacia(){ return espera.isEmpty(); }
+  public int size(){ return espera.size(); }
+}  
