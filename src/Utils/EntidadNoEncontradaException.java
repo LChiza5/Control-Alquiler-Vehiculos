@@ -8,7 +8,7 @@ package Utils;
  *
  * @author ilope
  */
-public class EntidadConDependenciasException extends Exception {
-    public EntidadConDependenciasException(String mensaje) 
+public class EntidadNoEncontradaException extends Exception {
+    public EntidadNoEncontradaException(String mensaje) 
     { super(mensaje); }
 }

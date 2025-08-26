@@ -8,7 +8,7 @@ package Utils;
  *
  * @author ilope
  */
-public class DuplicadoException extends Exception {
-    public DuplicadoException(String mensaje) 
+public class EliminacionNoPermitidoException extends Exception {
+    public EliminacionNoPermitidoException(String mensaje) 
     { super(mensaje); }
 }

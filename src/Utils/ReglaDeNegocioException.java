@@ -8,7 +8,7 @@ package Utils;
  *
  * @author ilope
  */
-public class ValidacionException extends Exception {
-    public ValidacionException(String mensaje) 
+public class ReglaDeNegocioException extends Exception {
+    public ReglaDeNegocioException(String mensaje) 
     { super(mensaje); }
 }
