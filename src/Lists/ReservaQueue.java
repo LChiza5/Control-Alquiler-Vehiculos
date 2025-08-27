@@ -12,7 +12,7 @@ import java.util.Queue;
  *
  * @author ilope
  */
-public class reservaList implements List<Reserva> {
+public class ReservaQueue implements List<Reserva> {
      private final Queue<Reserva> espera = new LinkedList<>();
 
   @Override

@@ -47,4 +47,8 @@ public class Contrato extends RegistroTemp{
     return "Contrato{id=%d, placa=%s, estado=%s, dias=%d}".formatted(
         id, vehiculo!=null?vehiculo.getPlaca():"-", estado, getDias());
     }
+
+    void setEstado(EstadoContrato estadoContrato) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }  

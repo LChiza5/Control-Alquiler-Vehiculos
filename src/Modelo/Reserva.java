@@ -47,5 +47,13 @@ public class Reserva extends RegistroTemp {
     var placa = (vehiculo != null ? vehiculo.getPlaca() : "pendiente");
     return "Reserva{id=%d, cliente=%s, vehiculo=%s, dias=%d}".formatted(id, cliente.getCedula(), placa, getDias());
     } 
+
+    void setVehiculo(Vehiculo disp) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    void setEstado(String confirmada) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     
 }
