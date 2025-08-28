@@ -31,11 +31,13 @@ public class Validators {
   }
 
   // --- Teléfono ---
-  public static void telefono(String s, int largo) throws ReglaDeNegocioException{
+  public static void telefono(String s, int largo) throws ReglaDeNegocioException {
     noVacio(s, "teléfono");
-    if (s.length() != largo || !s.chars().allMatch(Character::isDigit))
-      throw new ReglaDeNegocioException("Teléfono debe tener " + largo + " dígitos numéricos.");
-  }
+    String clean = s.trim().replaceAll("\\s+", ""); // quita espacios
+    if (clean.length() != largo || !clean.chars().allMatch(Character::isDigit)) {
+        throw new ReglaDeNegocioException("Teléfono debe tener " + largo + " dígitos numéricos.");
+    }
+}
 
   // --- Mayor de edad ---
   public static void mayorDeEdad(LocalDate fechaNac) throws ReglaDeNegocioException{

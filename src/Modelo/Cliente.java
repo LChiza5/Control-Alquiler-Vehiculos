@@ -27,6 +27,14 @@ public class Cliente extends Persona {
     public void setLicencia(String licencia) {
     this.licencia = licencia;
 }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setFechaNac(LocalDate fechaNac) {
+        this.fechaNac = fechaNac;
+    }
      
   
 }

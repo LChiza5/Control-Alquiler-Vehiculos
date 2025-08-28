@@ -21,14 +21,34 @@ public class FrmCliente extends javax.swing.JInternalFrame {
     public FrmCliente() {
         initComponents();
     }
-     public void setClienteToForm(Cliente c) {
-        if (c == null) return;
-        txtId.setText(c.getCedula());
-        txtName.setText(c.getNombre());
-        txtTelefono.setText(c.getTelefono());
-        txtCorreo.setText(c.getCorreo());
-        txtLicencia.setText(c.getLicencia());
+    public void abrirDialogoBusqueda(Lists.clienteList lista) {
+    java.awt.Frame owner = null;
+    java.awt.Container top = getTopLevelAncestor();
+    if (top instanceof java.awt.Frame) owner = (java.awt.Frame) top;
+
+    FrmBuscarClientes dlg = new FrmBuscarClientes(owner, true); // modal
+    dlg.setList(lista);
+    dlg.setLocationRelativeTo(this);
+    dlg.setVisible(true); // bloquea hasta cerrar
+
+    Modelo.Cliente sel = dlg.getClienteSeleccionado();
+    if (sel != null) {
+        setClienteToForm(sel); // ← Carga en el formulario
     }
+}
+     public void setClienteToForm(Modelo.Cliente c) {
+    if (c == null) return;
+    txtId.setText(c.getCedula());
+    txtName.setText(c.getNombre());
+    txtTelefono.setText(c.getTelefono());
+    txtCorreo.setText(c.getCorreo());
+    txtLicencia.setText(c.getLicencia());
+    if (c.getFechaNac() != null) {
+        txtBirthday.setText(c.getFechaNac().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+    } else {
+        txtBirthday.setText("");
+    }
+}
 
     // Limpia campos
     public void clearForm() {
@@ -37,19 +57,34 @@ public class FrmCliente extends javax.swing.JInternalFrame {
         txtTelefono.setText("");
         txtCorreo.setText("");
         txtLicencia.setText("");
+        txtBirthday.setText("");
     }
     public Cliente getClienteFromForm() {
-    LocalDate fechaNacimiento = LocalDate.now();
-    try {
-        String fechaTexto = txtBirthday.getText().trim();
-        if (!fechaTexto.isEmpty()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            fechaNacimiento = LocalDate.parse(fechaTexto, formatter);
-        }
-    } catch (Exception e) {
-        // si hay error, queda la fecha actual o puedes lanzar excepción
-        
+    // Confirma edición de formateados (por si están en edición)
+    Utils.UtilGUI.commitEdit(txtId);
+    Utils.UtilGUI.commitEdit(txtTelefono);
+    String tel = txtTelefono.getText().trim();
+    Utils.UtilGUI.commitEdit(txtLicencia);
+    Utils.UtilGUI.commitEdit(txtBirthday);
+
+    if (!Utils.UtilGUI.validateRequiere(this, txtId, txtName, txtTelefono, txtCorreo, txtLicencia, txtBirthday)) {
+        return null; // ya mostró mensaje y resaltó
     }
+
+    // Validaciones básicas
+    if (!Utils.UtilGUI.telefono8(txtTelefono.getText())) {
+        Utils.UtilGUI.showErrorMessage(this, "Teléfono debe tener 8 dígitos.", "Dato inválido");
+        txtTelefono.requestFocus();
+        return null;
+    }
+    if (!Utils.UtilGUI.email(txtCorreo.getText())) {
+        Utils.UtilGUI.showErrorMessage(this, "Correo con formato inválido.", "Dato inválido");
+        txtCorreo.requestFocus();
+        return null;
+    }
+
+    LocalDate fechaNacimiento = Utils.UtilGUI.parseLocalDate(this, txtBirthday, true);
+    if (fechaNacimiento == null) return null; // ya avisó
 
     return new Cliente(
         getCedula(),
@@ -60,6 +95,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
         getLicencia()
     );
     }
+    
     public String getCedula()   { return txtId.getText().trim(); }
     public String getNombre()   { return txtName.getText().trim(); }
     public String getTelefono() { return txtTelefono.getText().trim(); }
@@ -83,6 +119,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
         btnEliminar = new javax.swing.JButton();
         btnBuscar = new javax.swing.JButton();
         btnActualizar = new javax.swing.JButton();
+        btnClear = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         txtId = new javax.swing.JFormattedTextField();
         txtName = new javax.swing.JTextField();
@@ -120,20 +157,29 @@ public class FrmCliente extends javax.swing.JInternalFrame {
 
         btnActualizar.setText("Actualizar");
 
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/application_vnd.oasis.opendocument.spreadsheet (4).png"))); // NOI18N
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(156, 156, 156)
-                .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(38, 38, 38)
-                .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(36, 36, 36)
+                .addGap(102, 102, 102)
                 .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26)
+                .addGap(18, 18, 18)
+                .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(29, 29, 29)
+                .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(22, 22, 22)
+                .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(btnActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(176, Short.MAX_VALUE))
+                .addContainerGap(140, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -143,7 +189,8 @@ public class FrmCliente extends javax.swing.JInternalFrame {
                     .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(19, 19, 19))
         );
 
@@ -152,7 +199,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
 
         try {
-            txtId.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("A-####")));
+            txtId.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("#-####-####")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
@@ -176,7 +223,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
         jLabel3.setText("Nombre");
         jLabel3.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 3, true));
 
-        txtBirthday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/YYYY"))));
+        txtBirthday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/yyyy"))));
         txtBirthday.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtBirthdayActionPerformed(evt);
@@ -198,7 +245,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
         });
 
         try {
-            txtTelefono.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("A-####")));
+            txtTelefono.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("########")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
@@ -217,7 +264,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
         jLabel5.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 3, true));
 
         try {
-            txtLicencia.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("A-####")));
+            txtLicencia.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("********")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
@@ -273,9 +320,9 @@ public class FrmCliente extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(12, 12, 12))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(txtLicencia, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -334,10 +381,15 @@ public class FrmCliente extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtLicenciaActionPerformed
 
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        clearForm();
+    }//GEN-LAST:event_btnClearActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualizar;
     private javax.swing.JButton btnBuscar;
+    private javax.swing.JButton btnClear;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JLabel jLabel1;

@@ -97,4 +97,11 @@ public class clienteList implements List<Cliente> {
     protected boolean tieneReservasActivas(String cedula) {
         return false; // TODO: conectar con reservas
     }
+    public Modelo.Cliente find(String cedula) {
+    if (cedula == null) return null;
+    for (Modelo.Cliente c : data) {
+        if (cedula.equals(c.getCedula())) return c;
+    }
+    return null;
+    }
 }

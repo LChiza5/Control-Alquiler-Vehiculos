@@ -26,8 +26,10 @@ public class FrmMain extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
         repo = new clienteList();
-        frmCliente = new FrmCliente();
-        controller = new ClienteController(repo, frmCliente);
+    frmCliente = new FrmCliente();
+
+    // Controlador (pasa SIEMPRE el mismo repo y la misma vista)
+    controller = new ClienteController(frmCliente, repo);
     
     }
 

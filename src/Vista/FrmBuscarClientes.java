@@ -7,6 +7,7 @@ package Vista;
 import Lists.clienteList;
 import Modelo.Cliente;
 import Utils.UtilGUI;
+import java.util.List;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -32,21 +33,36 @@ public class FrmBuscarClientes extends javax.swing.JDialog {
         sorter = new TableRowSorter<>(model);
         tblClientes.setRowSorter(sorter);
     }
-    public Cliente getClienteSeleccionado() {
-        return clienteSeleccionado;
+    private void aceptar() {
+        int viewRow = tblClientes.getSelectedRow();
+        if (viewRow == -1) {
+            UtilGUI.showErrorMessage(this, "Debe seleccionar un cliente", "Error");
+            return;
+        }
+        int modelRow = tblClientes.convertRowIndexToModel(viewRow);
+        String cedula = String.valueOf(model.getValueAt(modelRow, 0));
+        clienteSeleccionado = list.find(cedula);
+        dispose();
     }
+
     public void setList(clienteList list) {
         this.list = list;
         loadTable();
     }
 
-
     private void loadTable() {
         model.setRowCount(0);
-        for (Cliente c : list.listar()) {
-            Object[] data = {c.getCedula(), c.getNombre(), c.getTelefono(), c.getCorreo(), c.getLicencia()};
-            model.addRow(data);
+        if (list == null) return;
+        List<Cliente> datos = list.listar();
+        for (Cliente c : datos) {
+            model.addRow(new Object[]{
+                    c.getCedula(), c.getNombre(), c.getTelefono(), c.getCorreo(), c.getLicencia()
+            });
         }
+    }
+
+    public Cliente getClienteSeleccionado() {
+        return clienteSeleccionado;
     }
 
     /**
@@ -126,12 +142,14 @@ public class FrmBuscarClientes extends javax.swing.JDialog {
                 .addGap(110, 110, 110))
         );
 
+        btnAceptar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/accepted_48.png"))); // NOI18N
         btnAceptar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAceptarActionPerformed(evt);
             }
         });
 
+        btnCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/button_cancel (4).png"))); // NOI18N
         btnCancelar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelarActionPerformed(evt);
@@ -182,19 +200,12 @@ public class FrmBuscarClientes extends javax.swing.JDialog {
     }//GEN-LAST:event_txtNombreenter
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        int row = tblClientes.getSelectedRow();
-        if (row == -1) {
-            UtilGUI.showErrorMessage(this, "Debe seleccionar un cliente", "Error");
-            return;
-        }
-        String cedula = String.valueOf(tblClientes.getValueAt(row, 0));
-        clienteSeleccionado = list.find(cedula);
-        setVisible(false);
-        dispose();
+        clienteSeleccionado = null;
+            dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
-        setVisible(false);
+        aceptar();
         dispose();
     }//GEN-LAST:event_btnAceptarActionPerformed
 

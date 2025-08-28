@@ -4,86 +4,104 @@
  */
 package Controlador;
 
-import Lists.clienteList;
 import Modelo.Cliente;
-import Utils.EntidadNoEncontradaException;
 import Utils.ReglaDeNegocioException;
-import Vista.FrmCliente;
-import javax.swing.JOptionPane;
+import Utils.UtilGUI;
+import Utils.Validators;
+
+
 
 /**
  *
  * @author ilope
  */
 public class ClienteController {
-    private final clienteList repo;
-    private final FrmCliente vista;
+    private final Vista.FrmCliente frm;
+private final Lists.clienteList repo;
 
-    public ClienteController(clienteList repo, FrmCliente vista) {
-        this.repo = repo;
-        this.vista = vista;
+public ClienteController(Vista.FrmCliente frm, Lists.clienteList repo) {
+    this.frm = frm;
+    this.repo = repo;
+    wireEvents();
+}
 
-        // Enlazar eventos de la vista con acciones del controlador
-        vista.onGuardar(e -> guardar());
-        vista.onBuscar(e -> buscar());
-        vista.onActualizar(e -> {
+private void wireEvents() {
+    // Al pulsar Buscar → abrir diálogo y cargar selección
+    frm.onBuscar(e -> frm.abrirDialogoBusqueda(repo));
+
+    // (Ejemplos de otros botones por si aún no los conectaste)
+    frm.onGuardar(e -> {
+            Cliente c = frm.getClienteFromForm();
+            if (c == null) return; // la vista ya mostró mensaje si algo faltó
+
             try {
-                actualizar();
-            } catch (EntidadNoEncontradaException | ReglaDeNegocioException ex) {
-                JOptionPane.showMessageDialog(vista, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                // === VALIDACIONES DE NEGOCIO ===
+                Validators.noVacio(c.getCedula(), "cédula");
+                Validators.noVacio(c.getLicencia(), "licencia");
+                Validators.mayorDeEdad(c.getFechaNac());
+                Validators.telefono(c.getTelefono(), 8);
+                Validators.email(c.getCorreo());
+
+                boolean ok = repo.add(c);
+                if (!ok) {
+                    UtilGUI.showErrorMessage(frm, "No se pudo guardar (duplicado o inválido)", "Error");
+                    return;
+                }
+
+                UtilGUI.showMessage(frm, "Cliente guardado", "OK");
+                frm.clearForm();
+
+            } catch (ReglaDeNegocioException ex) {
+                // AQUÍ se muestran los mensajes de Validators
+                UtilGUI.showErrorMessage(frm, ex.getMessage(), "Error de validación");
             }
         });
-        vista.onEliminar(e -> {
+
+    frm.onActualizar(e -> {
+            String ced = frm.getCedula();
+            Cliente existe = repo.find(ced);
+            if (existe == null) {
+                UtilGUI.showErrorMessage(frm, "Cliente inexistente (Seleccione uno existente).", "Error");
+                return;
+            }
+            Cliente c = frm.getClienteFromForm();
+            if (c == null) return;
+
             try {
-                eliminar();
-            } catch (EntidadNoEncontradaException ex) {
-                JOptionPane.showMessageDialog(vista, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                // Revalida campos importantes
+                Validators.telefono(c.getTelefono(), 8);
+                Validators.email(c.getCorreo());
+
+                // Actualiza campos permitidos
+                existe.setNombre(c.getNombre());
+                existe.setTelefono(c.getTelefono());
+                existe.setCorreo(c.getCorreo());
+                existe.setLicencia(c.getLicencia());
+                existe.setFechaNac(c.getFechaNac());
+
+                UtilGUI.showMessage(frm, "Cliente actualizado", "OK");
+            } catch (ReglaDeNegocioException ex) {
+                UtilGUI.showErrorMessage(frm, ex.getMessage(), "Error de validación");
             }
         });
-    }
 
-    // ──────────── Métodos de operaciones ────────────
 
-    private void guardar() {
-        try {
-            Cliente c = vista.getClienteFromForm();
-            repo.add(c);
-            JOptionPane.showMessageDialog(vista, "Cliente agregado correctamente");
-        } catch (RuntimeException ex) {
-            JOptionPane.showMessageDialog(vista, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+    frm.onEliminar(e -> {
+            String ced = frm.getCedula();
+            Cliente c = repo.find(ced);
+            if (c == null) {
+                UtilGUI.showErrorMessage(frm, "No existe ese cliente (Seleccione uno existente).", "Error");
+                return;
+            }
+            if (!UtilGUI.confirm(frm, "¿Eliminar el cliente " + c.getNombre() + "?", "Confirmar")) return;
 
-    private void buscar() {
-        Cliente c = repo.find(vista.getCedula());
-        if (c != null) {
-            JOptionPane.showMessageDialog(vista, "Encontrado: " + c);
-        } else {
-            JOptionPane.showMessageDialog(vista, "Cliente no encontrado");
-        }
-    }
-
-    private void eliminar() throws EntidadNoEncontradaException {
-        Cliente c = repo.find(vista.getCedula());
-        if (c == null) throw new EntidadNoEncontradaException("Cliente no existe");
-
-        repo.remove(c);
-        JOptionPane.showMessageDialog(vista, "Cliente eliminado correctamente");
-    }
-
-    private void actualizar() throws EntidadNoEncontradaException, ReglaDeNegocioException {
-        String cedula   = vista.getCedula();
-        String telefono = vista.getTelefono();
-        String correo   = vista.getCorreo();
-        String licencia = vista.getLicencia();
-
-        // Validar existencia
-        Cliente existente = repo.find(cedula);
-        if (existente == null) throw new EntidadNoEncontradaException("Cliente no existe");
-
-        // Actualizar datos
-        repo.actualizarContacto(cedula, telefono, correo, licencia);
-
-        JOptionPane.showMessageDialog(vista, "Cliente actualizado correctamente");
+            boolean ok = repo.remove(c); // este debe bloquear si tiene reservas activas
+            if (!ok) {
+                UtilGUI.showErrorMessage(frm, "No se puede eliminar: tiene reservas activas.", "Error");
+                return;
+            }
+            UtilGUI.showMessage(frm, "Cliente eliminado", "OK");
+            frm.clearForm();
+        });
     }
 }
