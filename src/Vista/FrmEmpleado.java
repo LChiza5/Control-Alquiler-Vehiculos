@@ -48,6 +48,10 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
         jLabel12 = new javax.swing.JLabel();
         txtTelefono = new javax.swing.JTextField();
 
+        setBackground(new java.awt.Color(153, 153, 153));
+
+        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/3floppy_unmount (4).png"))); // NOI18N
+        btnSave.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveActionPerformed(evt);
@@ -72,6 +76,8 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
             }
         });
 
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/application_vnd.oasis.opendocument.spreadsheet (4).png"))); // NOI18N
+        btnClear.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnClearActionPerformed(evt);
@@ -80,8 +86,9 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
 
         jLabelEmpleados1.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabelEmpleados1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelEmpleados1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/contact (4).png"))); // NOI18N
         jLabelEmpleados1.setText("Empleados");
-        jLabelEmpleados1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jLabelEmpleados1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
@@ -94,6 +101,7 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
         jLabel8.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         jLabel8.setText("Puesto");
 
+        jLabel9.setBackground(new java.awt.Color(153, 153, 153));
         jLabel9.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         jLabel9.setText("Fecha De Nacimiento");
 
@@ -119,6 +127,7 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
             }
         });
 
+        txtBirthdate.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         txtBirthdate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/YYYY"))));
         txtBirthdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
