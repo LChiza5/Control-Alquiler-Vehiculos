@@ -71,8 +71,8 @@ public class ReservaManager {
     Vehiculo nuevo = vehiculoLista.find(placaNueva);
     if (nuevo == null) throw new EntidadNoEncontradaException("Vehículo no existe");
 
-    TipoVehiculo tipoOriginal = (r.getVehiculo() != null) ? r.getVehiculo().getTipo() : r.getTipoSolicitado();
-    if (nuevo.getTipo() != tipoOriginal)
+    TipoVehiculo tipoOriginal = (r.getVehiculo() != null) ? r.getVehiculo().getModelo(): r.getTipoSolicitado();
+    if (nuevo.getModelo()!= tipoOriginal)
       throw new ReglaDeNegocioException("El vehículo no coincide con el tipo solicitado");
 
     if (!vehiculoDisponibleEnRango(nuevo, r.getInicio(), r.getFin()))
@@ -135,7 +135,7 @@ public class ReservaManager {
   private Vehiculo buscarVehiculoDisponible(TipoVehiculo tipo, LocalDate ini, LocalDate fin) {
     Collection<Vehiculo> todos = vehiculoLista.todos();
     for (Vehiculo v : todos) {
-      if (v.getTipo() == tipo && v.getEstado() == EstadoVehiculo.DISPONIBLE) {
+      if (v.getModelo() == tipo && v.getEstado() == EstadoVehiculo.DISPONIBLE) {
         if (vehiculoDisponibleEnRango(v, ini, fin)) return v;
       }
     }

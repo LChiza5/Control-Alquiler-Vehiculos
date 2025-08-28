@@ -130,8 +130,11 @@ public class FrmMain extends javax.swing.JFrame {
             }
         }
     } catch (Exception e) {
-        e.printStackTrace();
-    }
+    javax.swing.JOptionPane.showMessageDialog(null,
+        "Error al aplicar Look&Feel: " + e.getMessage(),
+        "Error",
+        javax.swing.JOptionPane.ERROR_MESSAGE);
+}
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new FrmMain().setVisible(true);

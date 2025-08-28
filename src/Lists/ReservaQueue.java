@@ -31,7 +31,11 @@ public class ReservaQueue implements List<Reserva> {
   }
 
   @Override
-  public void showAll() { espera.forEach(System.out::println); }
+  public void showAll(){}
+  
+  public java.util.List<Reserva> listar() { 
+    return new java.util.ArrayList<>(espera); 
+}
 
   // comportamiento de cola
   public Reserva siguiente(){ return espera.poll(); }

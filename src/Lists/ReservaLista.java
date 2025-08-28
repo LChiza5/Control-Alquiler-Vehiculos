@@ -38,7 +38,7 @@ public class ReservaLista implements List<Reserva>{
 
     @Override
     public void showAll() {
-        data.forEach(System.out::println);
+       
     }
 
     // --- métodos útiles ---

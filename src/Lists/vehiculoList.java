@@ -6,15 +6,13 @@ package Lists;
 
 import Enums.EstadoVehiculo;
 import Modelo.Vehiculo;
-import Utils.EliminacionNoPermitidoException;
 import Utils.EntidadNoEncontradaException;
 import Utils.ReglaDeNegocioException;
 import Utils.Validators;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 /**
  *
@@ -25,45 +23,45 @@ public class vehiculoList implements List<Vehiculo> {
 
   @Override
   public boolean add(Vehiculo v) {
-        try {
-            validarNuevo(v);
-        } catch (ReglaDeNegocioException ex) {
-            Logger.getLogger(vehiculoList.class.getName()).log(Level.SEVERE, null, ex);
+    try {
+        validarNuevo(v);
+        if (porPlaca.containsKey(v.getPlaca())) {
+            throw new ReglaDeNegocioException("Placa duplicada: " + v.getPlaca());
         }
-    if (porPlaca.containsKey(v.getPlaca())) try {
-        throw new ReglaDeNegocioException("Placa duplicada: " + v.getPlaca());
-        } catch (ReglaDeNegocioException ex) {
-            Logger.getLogger(vehiculoList.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    porPlaca.put(v.getPlaca(), v);
-    return true;
-  }
+        porPlaca.put(v.getPlaca(), v);
+        return true;
+    } catch (ReglaDeNegocioException ex) {
+        // No imprimir en consola: la vista/controlador debe mostrar el mensaje
+        return false;
+    }
+}
 
-  @Override
-  public boolean remove(Vehiculo v) {
+// 2) remove(...)
+@Override
+public boolean remove(Vehiculo v) {
     if (v == null) return false;
-    if (v.getEstado() == EstadoVehiculo.EN_ALQUILER)
-      try {
-          throw new EliminacionNoPermitidoException("No se puede eliminar: vehículo en alquiler");
-    } catch (EliminacionNoPermitidoException ex) {
-        Logger.getLogger(vehiculoList.class.getName()).log(Level.SEVERE, null, ex);
+    if (v.getEstado() == EstadoVehiculo.EN_ALQUILER) {
+        // No se permite eliminar si está en alquiler
+        return false;
     }
     return porPlaca.remove(v.getPlaca()) != null;
-  }
+}
 
-  @Override
-  public Vehiculo find(Object id) {
-    return id == null ? null : porPlaca.get(String.valueOf(id));
-  }
+// 3) showAll()
+@Override
+public void showAll() {
+    // No imprimir en consola. La UI debe encargarse de mostrar datos.
+}
 
-  @Override
-  public void showAll() { porPlaca.values().forEach(System.out::println); }
 
-  public void actualizar(String placa, String modelo, Enums.TipoVehiculo tipo, EstadoVehiculo estado) throws EntidadNoEncontradaException, ReglaDeNegocioException{
+  public void actualizar(String placa, Enums.TipoVehiculo modelo, EstadoVehiculo estado) throws EntidadNoEncontradaException, ReglaDeNegocioException{
     var v = find(placa);
     if (v == null) throw new EntidadNoEncontradaException("Vehículo no encontrado");
-    if (modelo != null){ Validators.noVacio(modelo,"modelo"); v.setModelo(modelo); }
-    if (tipo   != null){ v.setTipo(tipo); }
+    if (modelo != null) { 
+    v.setModelo(modelo); 
+    } else {
+    throw new ReglaDeNegocioException("El campo 'modelo' es obligatorio.");
+    }
     if (estado != null){ v.setEstado(estado); }
   }
 
@@ -71,15 +69,19 @@ public class vehiculoList implements List<Vehiculo> {
     if (v == null) throw new ReglaDeNegocioException("Vehículo nulo");
     Validators.noVacio(v.getPlaca(), "placa");
     Validators.noVacio(v.getMarca(), "marca");
-    Validators.noVacio(v.getModelo(), "modelo");
     Validators.anioVehiculoValido(v.getAnio(), 20);
-    if (v.getTipo() == null)   throw new ReglaDeNegocioException("Tipo de vehículo obligatorio");
+    if (v.getModelo() == null)   throw new ReglaDeNegocioException("Tipo de vehículo obligatorio");
     if (v.getEstado() == null) throw new ReglaDeNegocioException("Estado de vehículo obligatorio");
   }
 
   // utilidades
   public boolean existePlaca(String placa){ return porPlaca.containsKey(placa); }
   public Collection<Vehiculo> todos(){ return porPlaca.values(); }
+
+    @Override
+    public Vehiculo find(Object id) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
    
     

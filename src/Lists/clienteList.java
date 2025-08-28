@@ -51,7 +51,7 @@ public class clienteList implements List<Cliente> {
 
     @Override
     public void showAll() {
-        data.forEach(System.out::println);
+        
     }
 
     // --- Métodos adicionales ---

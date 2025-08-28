@@ -13,9 +13,9 @@ import java.util.Objects;
  * @author ilope
  */
 public class Vehiculo {
-    private String placa, marca, modelo;
+    private String placa, marca;
     private int anio;
-    private TipoVehiculo tipo;
+    private TipoVehiculo modelo;
     private EstadoVehiculo estado;
 
     public String getPlaca() {
@@ -26,7 +26,7 @@ public class Vehiculo {
         return marca;
     }
 
-    public String getModelo() {
+    public TipoVehiculo getModelo() {
         return modelo;
     }
 
@@ -34,9 +34,7 @@ public class Vehiculo {
         return anio;
     }
 
-    public TipoVehiculo getTipo() {
-        return tipo;
-    }
+    
 
     public EstadoVehiculo getEstado() {
         return estado;
@@ -46,12 +44,11 @@ public class Vehiculo {
         this.estado = estado;
     }
 
-    public Vehiculo(String placa, String marca, String modelo, int anio, TipoVehiculo tipo, EstadoVehiculo estado) {
+    public Vehiculo(String placa, String marca, TipoVehiculo modelo, int anio, EstadoVehiculo estado) {
         this.placa = placa;
         this.marca = marca;
         this.modelo = modelo;
         this.anio = anio;
-        this.tipo = tipo;
         this.estado = estado;
     }
     
@@ -69,11 +66,9 @@ public class Vehiculo {
         return "Vehiculo{placa='%s', modelo='%s'}".formatted(placa,modelo); 
     }
 
-    public void setModelo(String modelo) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void setModelo(TipoVehiculo modelo) {
+        this.modelo = modelo;
     }
 
-    public void setTipo(TipoVehiculo tipo) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+   
 }

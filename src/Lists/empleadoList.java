@@ -21,20 +21,17 @@ public class empleadoList implements List<Empleado> {
 
     @Override
     public boolean add(Empleado e) {
-          try {
-              validarNuevo(e);
-          } catch (ReglaDeNegocioException ex) {
-              Logger.getLogger(empleadoList.class.getName()).log(Level.SEVERE, null, ex);
-          }
+    try {
+        validarNuevo(e);
         if (find(e.getCedula()) != null) {
-              try {
-                  throw new ReglaDeNegocioException("Empleado duplicado (cédula)");
-              } catch (ReglaDeNegocioException ex) {
-                  Logger.getLogger(empleadoList.class.getName()).log(Level.SEVERE, null, ex);
-              }
+            throw new ReglaDeNegocioException("Empleado duplicado (cédula)");
         }
         return data.add(e);
+    } catch (ReglaDeNegocioException ex) {
+        // Sin logs en consola
+        return false;
     }
+}
 
     @Override
     public boolean remove(Empleado e) {
@@ -53,7 +50,7 @@ public class empleadoList implements List<Empleado> {
 
     @Override
     public void showAll() {
-        data.forEach(System.out::println);
+        
     }
 
     public void actualizar(String cedula, String telefono, String correo, String puesto) throws ReglaDeNegocioException, EntidadNoEncontradaException{

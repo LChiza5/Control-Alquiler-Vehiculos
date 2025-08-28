@@ -31,7 +31,9 @@ public class ContratoList implements List<Contrato> {
     for (Contrato c : data) if (c.getId() == n) return c;
     return null;
   }
-  @Override public void showAll() { data.forEach(System.out::println); }
+  @Override public void showAll(){ 
+  
+  }
 
   public java.util.List<Contrato> listar(){ return data; }
 }

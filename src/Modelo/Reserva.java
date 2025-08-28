@@ -48,12 +48,11 @@ public class Reserva extends RegistroTemp {
     return "Reserva{id=%d, cliente=%s, vehiculo=%s, dias=%d}".formatted(id, cliente.getCedula(), placa, getDias());
     } 
 
-    void setVehiculo(Vehiculo disp) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    void setVehiculo(Vehiculo v) { 
+    this.vehiculo = v; 
+    this.tipoSolicitado = null; // al asignar vehículo, ya no se usa tipo
     }
+    void setEstado(String estado) { this.estado = estado; }
 
-    void setEstado(String confirmada) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
     
 }
