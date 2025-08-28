@@ -264,7 +264,7 @@ public class FrmCliente extends javax.swing.JInternalFrame {
         jLabel5.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 3, true));
 
         try {
-            txtLicencia.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("********")));
+            txtLicencia.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("B-#")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
