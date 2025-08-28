@@ -9,7 +9,7 @@ package Lists;
  * @author ilope
  */
 public interface List<T> {
-    boolean add(T t);
+    boolean add(T t); 
     boolean remove(T t);
     T find(Object id);
     void showAll();
