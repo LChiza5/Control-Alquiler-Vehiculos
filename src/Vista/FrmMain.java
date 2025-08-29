@@ -56,6 +56,7 @@ public class FrmMain extends javax.swing.JFrame {
      * Creates new form FrmMain
      */
     public FrmMain() {
+        initComponents();
         setLocationRelativeTo(null);
 
         // ===== Repos =====
