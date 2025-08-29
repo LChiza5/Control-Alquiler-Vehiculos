@@ -4,6 +4,11 @@
  */
 package Vista;
 
+import Modelo.Contrato;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import javax.swing.JButton;
+
 /**
  *
  * @author Luisk
@@ -15,6 +20,76 @@ public class FrmContratos extends javax.swing.JInternalFrame {
      */
     public FrmContratos() {
         initComponents();
+    }
+     public JButton getBtnSave()   { return btnSave; }
+    public JButton getBtnUpdate() { return btnUpdate; }
+    public JButton getBtnEliminar(){ return btnEliminar; }
+    public JButton getBtnSearch() { return btnSearch; }
+    public JButton getBtnClear()  { return btnClear; }
+
+    // ======= Helpers de campos =======
+    public String getNumeroContratoText() { return txtId1.getText().trim(); }
+    public String getCedulaCliente()       { return txtId2.getText().trim(); }
+    public String getPlacaSeleccionada()   { return (String) txtPuesto4.getSelectedItem(); }
+    public String getFechaInicioText()     { return txtIni.getText().trim(); }   // dd/MM/yyyy
+    public String getFechaFinText()        { return txtFin.getText().trim(); }
+
+    public void setNumeroContrato(int id)         { txtId1.setText(String.valueOf(id)); }
+    public void setMontoCalculado(String s)       { txtId3.setText(s); }
+    public void setEstado(String s)               { jComboBox2.setSelectedItem(s); }
+
+    public void setPlacas(List<String> placas) {
+        txtPuesto4.removeAllItems();
+        if (placas != null) for (String p : placas) txtPuesto4.addItem(p);
+        if (txtPuesto4.getItemCount() > 0) txtPuesto4.setSelectedIndex(0);
+    }
+
+    public void setEstados(List<String> estados) {
+        jComboBox2.removeAllItems();
+        if (estados != null) for (String e : estados) jComboBox2.addItem(e);
+        if (jComboBox2.getItemCount() > 0) jComboBox2.setSelectedIndex(0);
+    }
+
+    public void clearForm() {
+        txtId1.setText("");
+        txtId2.setText("");
+        txtIni.setText("");
+        txtFin.setText("");
+        txtId3.setText("");
+        if (txtPuesto4.getItemCount() > 0) txtPuesto4.setSelectedIndex(0);
+        if (jComboBox2.getItemCount() > 0) jComboBox2.setSelectedIndex(0);
+    }
+
+    public void setContratoToForm(Contrato c) {
+        if (c == null) return;
+
+        setNumeroContrato(c.getId());
+        // Cliente
+        if (c.getCliente() != null) {
+            txtId2.setText(c.getCliente().getCedula());
+        } else {
+            txtId2.setText("");
+        }
+        // Vehículo
+        if (c.getVehiculo() != null) {
+            String placa = c.getVehiculo().getPlaca();
+            // Asegura que esté en el combo
+            boolean found = false;
+            for (int i=0; i<txtPuesto4.getItemCount(); i++) {
+                if (placa.equals(txtPuesto4.getItemAt(i))) { found = true; break; }
+            }
+            if (!found) txtPuesto4.addItem(placa);
+            txtPuesto4.setSelectedItem(placa);
+        } else {
+            if (txtPuesto4.getItemCount() > 0) txtPuesto4.setSelectedIndex(0);
+        }
+        // Fechas
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        if (c.getInicio() != null) txtIni.setText(fmt.format(c.getInicio()));
+        if (c.getFin() != null)    txtFin.setText(fmt.format(c.getFin()));
+
+        setMontoCalculado(String.valueOf(c.getMonto()));
+        if (c.getEstado() != null) jComboBox2.setSelectedItem(c.getEstado().name());
     }
 
     /**
@@ -34,20 +109,22 @@ public class FrmContratos extends javax.swing.JInternalFrame {
         jLabel16 = new javax.swing.JLabel();
         txtPuesto4 = new javax.swing.JComboBox<>();
         txtId1 = new javax.swing.JTextField();
-        txtBirthdate = new javax.swing.JFormattedTextField();
+        txtIni = new javax.swing.JFormattedTextField();
         jComboBox2 = new javax.swing.JComboBox<>();
         jLabel17 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         txtId2 = new javax.swing.JTextField();
         jLabel20 = new javax.swing.JLabel();
-        txtBirthdate1 = new javax.swing.JFormattedTextField();
+        txtFin = new javax.swing.JFormattedTextField();
         txtId3 = new javax.swing.JTextField();
         btnSave = new javax.swing.JButton();
         btnUpdate = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
         btnSearch = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
+
+        setClosable(true);
 
         jPanel1.setBackground(new java.awt.Color(51, 51, 51));
 
@@ -94,12 +171,12 @@ public class FrmContratos extends javax.swing.JInternalFrame {
         txtId1.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         txtId1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        txtBirthdate.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        txtBirthdate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/YYYY"))));
-        txtBirthdate.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        txtBirthdate.addActionListener(new java.awt.event.ActionListener() {
+        txtIni.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        txtIni.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/YYYY"))));
+        txtIni.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtIni.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtBirthdateActionPerformed(evt);
+                txtIniActionPerformed(evt);
             }
         });
 
@@ -134,12 +211,12 @@ public class FrmContratos extends javax.swing.JInternalFrame {
         jLabel20.setText("Fecha Inicio");
         jLabel20.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        txtBirthdate1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        txtBirthdate1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/YYYY"))));
-        txtBirthdate1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        txtBirthdate1.addActionListener(new java.awt.event.ActionListener() {
+        txtFin.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        txtFin.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/YYYY"))));
+        txtFin.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtFin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtBirthdate1ActionPerformed(evt);
+                txtFinActionPerformed(evt);
             }
         });
 
@@ -158,10 +235,10 @@ public class FrmContratos extends javax.swing.JInternalFrame {
                             .addGroup(jPanel5Layout.createSequentialGroup()
                                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel20)
-                                    .addComponent(txtBirthdate, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(txtIni, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(35, 35, 35)
                                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtBirthdate1, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtFin, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel16))
                                 .addGap(49, 49, 49)
                                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -200,7 +277,7 @@ public class FrmContratos extends javax.swing.JInternalFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtId1)
                     .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtPuesto4, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
+                        .addComponent(txtPuesto4, javax.swing.GroupLayout.PREFERRED_SIZE, 34, Short.MAX_VALUE)
                         .addComponent(txtId2)))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -212,8 +289,8 @@ public class FrmContratos extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtBirthdate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtBirthdate1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtIni, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtFin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jComboBox2))
                     .addComponent(txtId3, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(74, 74, 74))
@@ -304,13 +381,13 @@ public class FrmContratos extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtPuesto4ActionPerformed
 
-    private void txtBirthdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBirthdateActionPerformed
+    private void txtIniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIniActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtBirthdateActionPerformed
+    }//GEN-LAST:event_txtIniActionPerformed
 
-    private void txtBirthdate1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBirthdate1ActionPerformed
+    private void txtFinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFinActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtBirthdate1ActionPerformed
+    }//GEN-LAST:event_txtFinActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -330,11 +407,11 @@ public class FrmContratos extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JFormattedTextField txtBirthdate;
-    private javax.swing.JFormattedTextField txtBirthdate1;
+    private javax.swing.JFormattedTextField txtFin;
     private javax.swing.JTextField txtId1;
     private javax.swing.JTextField txtId2;
     private javax.swing.JTextField txtId3;
+    private javax.swing.JFormattedTextField txtIni;
     private javax.swing.JComboBox<String> txtPuesto4;
     // End of variables declaration//GEN-END:variables
 }

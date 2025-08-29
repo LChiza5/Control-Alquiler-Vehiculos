@@ -12,8 +12,9 @@ import java.util.ArrayList;
  *
  * @author ilope
  */
-public class ReservaLista implements List<Reserva>{
-   private final java.util.List<Reserva> data = new ArrayList<>();
+public class ReservaLista implements List<Reserva> {
+
+    private final java.util.List<Reserva> data = new ArrayList<>();
 
     @Override
     public boolean add(Reserva r) {
@@ -29,19 +30,19 @@ public class ReservaLista implements List<Reserva>{
     public Reserva find(Object id) {
         if (id == null) return null;
         int n;
-        try { 
-            n = (id instanceof Integer) ? (Integer) id : Integer.parseInt(id.toString()); 
+        try {
+            n = (id instanceof Integer) ? (Integer) id : Integer.parseInt(id.toString());
+        } catch (NumberFormatException e) {
+            return null;
         }
-        catch (NumberFormatException e){ return null; }
-        return data.stream().filter(x -> x.getId() == n).findFirst().orElse(null);
+        for (Reserva r : data) if (r.getId() == n) return r;
+        return null;
     }
 
     @Override
-    public void showAll() {
-       
-    }
+    public void showAll() { /* opcional */ }
 
-    // --- métodos útiles ---
+    // Helpers útiles
     public java.util.List<Reserva> listar() {
         return data;
     }
@@ -50,5 +51,5 @@ public class ReservaLista implements List<Reserva>{
         Reserva r = find(id);
         if (r == null) throw new EntidadNoEncontradaException("Reserva no encontrada");
         data.remove(r);
-    } 
+    }
 }

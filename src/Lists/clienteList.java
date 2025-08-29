@@ -104,4 +104,8 @@ public class clienteList implements List<Cliente> {
     }
     return null;
     }
+    public java.util.List<Cliente> todos() {
+    return new java.util.ArrayList<>(data);
+}
+    
 }

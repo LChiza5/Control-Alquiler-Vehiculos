@@ -22,115 +22,146 @@ import java.time.temporal.ChronoUnit;
  * @author ilope
  */
 public class ContratoManager {
-    private final clienteList clienteLista;
-  private final vehiculoList vehiculoLista;
-  private final ReservaLista reservaLista;
-  private final ContratoList contratoLista;
 
-  public ContratoManager(clienteList clienteLista, vehiculoList vehiculoLista,
-                         ReservaLista reservaLista, ContratoList contratoLista) {
-    this.clienteLista = clienteLista;
-    this.vehiculoLista = vehiculoLista;
-    this.reservaLista = reservaLista;
-    this.contratoLista = contratoLista;
-  }
+    private final clienteList clienteRepo;
+    private final vehiculoList vehiculoRepo;
+    private final ReservaLista reservaRepo;
+    private final ContratoList contratoRepo;
 
-  /** Crear contrato sin reserva previa. */
-  public Contrato crearContrato(String cedulaCliente, String placaVehiculo,
-                                LocalDate inicio, LocalDate fin, double tarifaDiaria) throws ReglaDeNegocioException, EntidadNoEncontradaException {
-    Validators.inicioNoAntesDeHoy(inicio);
-    Validators.finPosterior(inicio, fin);
-    Validators.duracionMaxima(inicio, fin, 30);
-
-    Cliente cliente = clienteLista.find(cedulaCliente);
-    if (cliente == null) throw new EntidadNoEncontradaException("Cliente no encontrado");
-
-    Vehiculo vehiculo = vehiculoLista.find(placaVehiculo);
-    if (vehiculo == null) throw new EntidadNoEncontradaException("Vehículo no encontrado");
-
-    if (vehiculo.getEstado() != EstadoVehiculo.DISPONIBLE)
-      throw new ReglaDeNegocioException("El vehículo no está disponible");
-
-    if (!vehiculoDisponibleParaContrato(vehiculo, inicio, fin))
-      throw new ReglaDeNegocioException("El vehículo ya está reservado o en contrato activo en ese rango");
-
-    int id = contratoLista.listar().size() + 1;
-    double monto = tarifaDiaria * ChronoUnit.DAYS.between(inicio, fin);
-
-    Contrato c = new Contrato(id, cliente, vehiculo, inicio, fin, monto, EstadoContrato.ACTIVO);
-    contratoLista.add(c);
-    return c;
-  }
-
-  /** Crear contrato desde una reserva confirmada. */
-  public Contrato crearDesdeReserva(int idReserva, double tarifaDiaria) throws EntidadNoEncontradaException, ReglaDeNegocioException {
-    Reserva r = reservaLista.find(idReserva);
-    if (r == null) throw new EntidadNoEncontradaException("Reserva no encontrada");
-    if (!"CONFIRMADA".equals(r.getEstado()))
-      throw new EstadoInvalidoException("Solo reservas CONFIRMADAS pueden generar contrato");
-
-    Contrato c = crearContrato(r.getCliente().getCedula(), r.getVehiculo().getPlaca(),
-            r.getInicio(), r.getFin(), tarifaDiaria);
-
-    reservaLista.remove(r);
-    return c;
-  }
-
-  /** Iniciar contrato → vehículo EN_ALQUILER. */
-  public void iniciarContrato(int idContrato) throws EntidadNoEncontradaException {
-    Contrato c = contratoLista.find(idContrato);
-    if (c == null) throw new EntidadNoEncontradaException("Contrato no encontrado");
-    if (c.getEstado() != EstadoContrato.ACTIVO)
-      throw new EstadoInvalidoException("El contrato no está en estado ACTIVO");
-
-    if (c.getInicio().isAfter(LocalDate.now()))
-      throw new EstadoInvalidoException("No se puede iniciar antes de la fecha de inicio");
-
-    c.getVehiculo().setEstado(EstadoVehiculo.EN_ALQUILER);
-  }
-
-  /** Finalizar contrato → estado FINALIZADO, vehículo DISPONIBLE. */
-  public void finalizarContrato(int idContrato) throws EntidadNoEncontradaException {
-    Contrato c = contratoLista.find(idContrato);
-    if (c == null) throw new EntidadNoEncontradaException("Contrato no encontrado");
-    if (c.getEstado() != EstadoContrato.ACTIVO)
-      throw new EstadoInvalidoException("Solo contratos ACTIVO pueden finalizarse");
-
-    c.setEstado(EstadoContrato.FINALIZADO);
-    c.getVehiculo().setEstado(EstadoVehiculo.DISPONIBLE);
-  }
-
-  /** Cancelar contrato → estado CANCELADO (no si ya finalizado). */
-  public void cancelarContrato(int idContrato) throws EntidadNoEncontradaException {
-    Contrato c = contratoLista.find(idContrato);
-    if (c == null) throw new EntidadNoEncontradaException("Contrato no encontrado");
-    if (c.getEstado() == EstadoContrato.FINALIZADO)
-      throw new EstadoInvalidoException("No se puede cancelar un contrato finalizado");
-
-    c.setEstado(EstadoContrato.CANCELADO);
-    if (c.getVehiculo().getEstado() == EstadoVehiculo.EN_ALQUILER) {
-      c.getVehiculo().setEstado(EstadoVehiculo.DISPONIBLE);
+    public ContratoManager(clienteList clientes, vehiculoList vehiculos,
+                           ReservaLista reservas, ContratoList contratos) {
+        this.clienteRepo = clientes;
+        this.vehiculoRepo = vehiculos;
+        this.reservaRepo = reservas;
+        this.contratoRepo = contratos;
     }
-  }
 
-  // --- helpers ---
-  private boolean vehiculoDisponibleParaContrato(Vehiculo v, LocalDate ini, LocalDate fin) {
-    // reservas confirmadas
-    for (Reserva r : reservaLista.listar()) {
-      if (r.getVehiculo() != null && v.getPlaca().equals(r.getVehiculo().getPlaca())) {
-        if (solapa(r.getInicio(), r.getFin(), ini, fin)) return false;
-      }
-    }
-    // contratos activos
-    for (Contrato c : contratoLista.listar()) {
-      if (v.getPlaca().equals(c.getVehiculo().getPlaca()) && c.getEstado() == EstadoContrato.ACTIVO) {
-        if (solapa(c.getInicio(), c.getFin(), ini, fin)) return false;
-      }
-    }
-    return true;
-  }
+    public class GestorContratos {
 
-  private boolean solapa(LocalDate a1, LocalDate a2, LocalDate b1, LocalDate b2) {
-    return !a2.isBefore(b1) && !b2.isBefore(a1);
-  }
+        /** Crear desde reserva confirmada (idReserva) */
+        public Contrato crearDesdeReserva(int idReserva, double tarifaDiaria)
+                throws EntidadNoEncontradaException, ReglaDeNegocioException {
+
+            if (tarifaDiaria <= 0) throw new ReglaDeNegocioException("Tarifa diaria inválida");
+
+            Reserva r = reservaRepo.find(idReserva);
+            if (r == null) throw new EntidadNoEncontradaException("Reserva no existe");
+            if (!"CONFIRMADA".equalsIgnoreCase(r.getEstado()))
+                throw new ReglaDeNegocioException("La reserva no está confirmada");
+
+            Cliente c = r.getCliente();
+            Vehiculo v = r.getVehiculo();
+            if (c == null || v == null) throw new ReglaDeNegocioException("Reserva incompleta (cliente/vehículo)");
+
+            // Validaciones de fechas
+            Validators.inicioNoAntesDeHoy(r.getInicio());
+            Validators.finPosterior(r.getInicio(), r.getFin());
+
+            // Vehículo debe estar disponible para el rango (sin contratos activos solapados)
+            if (!disponibleParaAlquiler(v, r.getInicio(), r.getFin()))
+                throw new ReglaDeNegocioException("Ya existe un alquiler activo para ese vehículo en ese rango");
+
+            // Crear contrato ACTIVO
+            int id = generarIdContrato();
+            Contrato cto = new Contrato(id, c, v, r.getInicio(), r.getFin(), tarifaDiaria, EstadoContrato.ACTIVO);
+            cto.setMonto(calcularMonto(cto.getInicio(), cto.getFin(), tarifaDiaria));
+            contratoRepo.add(cto);
+
+            // Cambiar estado del vehículo
+            v.setEstado(EstadoVehiculo.EN_ALQUILER);
+
+            // (Opcional) remover la reserva de la lista, o marcarla; aquí la removemos:
+            reservaRepo.remove(r);
+
+            return cto;
+        }
+
+        /** Crear ad-hoc (sin reserva previa) */
+        public Contrato crearAdHoc(String cedula, String placa, LocalDate inicio, LocalDate fin, double tarifaDiaria)
+                throws EntidadNoEncontradaException, ReglaDeNegocioException {
+
+            if (cedula == null || cedula.isBlank()) throw new ReglaDeNegocioException("Cédula requerida");
+            if (placa == null || placa.isBlank()) throw new ReglaDeNegocioException("Placa requerida");
+            if (tarifaDiaria <= 0) throw new ReglaDeNegocioException("Tarifa diaria inválida");
+
+            // Validaciones de fechas
+            Validators.inicioNoAntesDeHoy(inicio);
+            Validators.finPosterior(inicio, fin);
+
+            Cliente c = clienteRepo.find(cedula);
+            if (c == null) throw new EntidadNoEncontradaException("Cliente no existe: " + cedula);
+
+            Vehiculo v = vehiculoRepo.find(placa);
+            if (v == null) throw new EntidadNoEncontradaException("Vehículo no existe: " + placa);
+            if (v.getEstado() == EstadoVehiculo.EN_MANTENIMIENTO)
+                throw new ReglaDeNegocioException("El vehículo está en mantenimiento");
+
+            // No permitir alquiler si hay contrato ACTIVO solapado
+            if (!disponibleParaAlquiler(v, inicio, fin))
+                throw new ReglaDeNegocioException("Ya existe un alquiler activo para ese vehículo en ese rango");
+
+            // Crear contrato ACTIVO
+            int id = generarIdContrato();
+            Contrato cto = new Contrato(id, c, v, inicio, fin, tarifaDiaria, EstadoContrato.ACTIVO);
+            cto.setMonto(calcularMonto(inicio, fin, tarifaDiaria));
+            contratoRepo.add(cto);
+
+            // Cambiar estado del vehículo
+            v.setEstado(EstadoVehiculo.EN_ALQUILER);
+
+            return cto;
+        }
+
+        /** Finalizar contrato (solo ACTIVO) → libera vehículo */
+        public void finalizar(int idContrato) throws EntidadNoEncontradaException, EstadoInvalidoException {
+            Contrato c = contratoRepo.find(idContrato);
+            if (c == null) throw new EntidadNoEncontradaException("Contrato no encontrado");
+            if (c.getEstado() != EstadoContrato.ACTIVO)
+                throw new EstadoInvalidoException("Solo contratos ACTIVO pueden finalizarse");
+
+            c.setEstado(EstadoContrato.FINALIZADO);
+            // Liberar vehículo
+            if (c.getVehiculo() != null) c.getVehiculo().setEstado(EstadoVehiculo.DISPONIBLE);
+        }
+
+        /** Cancelar contrato (no permite cancelar si ya está FINALIZADO) */
+        public void cancelar(int idContrato) throws EntidadNoEncontradaException, EstadoInvalidoException {
+            Contrato c = contratoRepo.find(idContrato);
+            if (c == null) throw new EntidadNoEncontradaException("Contrato no encontrado");
+            if (c.getEstado() == EstadoContrato.FINALIZADO)
+                throw new EstadoInvalidoException("No se puede cancelar un contrato finalizado");
+
+            c.setEstado(EstadoContrato.CANCELADO);
+            // Si estaba ACTIVO, liberar vehículo
+            if (c.getVehiculo() != null) c.getVehiculo().setEstado(EstadoVehiculo.DISPONIBLE);
+        }
+
+        // ===== Helpers =====
+
+        private int generarIdContrato() {
+            return contratoRepo.listar().size() + 1;
+        }
+
+        private boolean disponibleParaAlquiler(Vehiculo v, LocalDate ini, LocalDate fin) {
+            for (Contrato c : contratoRepo.listar()) {
+                if (c.getEstado() == EstadoContrato.ACTIVO &&
+                    c.getVehiculo() != null &&
+                    v.getPlaca().equals(c.getVehiculo().getPlaca())) {
+                    if (solapa(c.getInicio(), c.getFin(), ini, fin)) return false;
+                }
+            }
+            return true;
+        }
+
+        // igual criterio que usaste en reservas (fin inclusivo)
+        private boolean solapa(LocalDate a1, LocalDate a2, LocalDate b1, LocalDate b2) {
+            return !a2.isBefore(b1) && !b2.isBefore(a1);
+        }
+
+        private double calcularMonto(LocalDate ini, LocalDate fin, double tarifaDiaria) {
+            long dias = ChronoUnit.DAYS.between(ini, fin) + 1; // [ini, fin] inclusivo
+            if (dias <= 0) dias = 1;
+            return tarifaDiaria * dias;
+        }
+    }
 }

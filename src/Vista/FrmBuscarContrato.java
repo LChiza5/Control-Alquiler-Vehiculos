@@ -4,17 +4,109 @@
  */
 package Vista;
 
+import Modelo.Cliente;
+import Modelo.Contrato;
+import Modelo.Vehiculo;
+import java.awt.Frame;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JOptionPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
+
 /**
  *
  * @author Luisk
  */
-public class FrmBuscarContrato extends javax.swing.JInternalFrame {
+public class FrmBuscarContrato extends javax.swing.JDialog {
+    private java.util.List<Contrato> data = new ArrayList<>();
+    private final Map<Integer, Contrato> porId = new HashMap<>();
+    private Contrato contratoSeleccionado;
 
+    private DefaultTableModel model;
+    private TableRowSorter<DefaultTableModel> sorter;
     /**
      * Creates new form FrmBuscarContrato
      */
-    public FrmBuscarContrato() {
+    public FrmBuscarContrato(Frame parent, boolean modal) {
+        super(parent, modal);
         initComponents();
+        model  = (DefaultTableModel) tblContrato.getModel();
+        sorter = new TableRowSorter<>(model);
+        tblContrato.setRowSorter(sorter);
+
+        txtNombre.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { aplicarFiltro(); }
+            public void removeUpdate(DocumentEvent e) { aplicarFiltro(); }
+            public void changedUpdate(DocumentEvent e) { aplicarFiltro(); }
+        });
+    }
+    public void setResultados(java.util.List<Contrato> items) {
+        data.clear();
+        porId.clear();
+        if (items != null) data.addAll(items);
+        for (Contrato c : data) porId.put(c.getId(), c);
+        loadTable();
+    }
+
+    public Contrato getContratoSeleccionado() {
+        return contratoSeleccionado;
+    }
+
+    // ===== Helpers =====
+    private void loadTable() {
+        model.setRowCount(0);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        for (Contrato c : data) {
+            Cliente cli = c.getCliente();
+            Vehiculo v  = c.getVehiculo();
+
+            String num   = String.valueOf(c.getId());
+            String nom   = (cli == null ? "" : cli.getNombre());
+            String placa = (v == null ? "" : v.getPlaca());
+            String ini   = (c.getInicio() == null ? "" : fmt.format(c.getInicio()));
+            String fin   = (c.getFin() == null ? "" : fmt.format(c.getFin()));
+            String est   = (c.getEstado() == null ? "" : c.getEstado().name());
+            String monto = String.valueOf(c.getMonto());
+
+            model.addRow(new Object[]{ num, nom, placa, ini, fin, est, monto });
+        }
+
+        if (model.getRowCount() > 0) {
+            tblContrato.setRowSelectionInterval(0, 0);
+        }
+    }
+
+    private void aplicarFiltro() {
+        String text = txtNombre.getText();
+        if (text == null || text.trim().isEmpty()) {
+            sorter.setRowFilter(null);
+        } else {
+            sorter.setRowFilter(javax.swing.RowFilter.regexFilter("(?i)" + text));
+        }
+    }
+
+    private void aceptar() {
+        int viewRow = tblContrato.getSelectedRow();
+        if (viewRow == -1) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un contrato", "Atención", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int modelRow = tblContrato.convertRowIndexToModel(viewRow);
+        Object val = model.getValueAt(modelRow, 0); // col 0 = Número Contrato
+        try {
+            int id = Integer.parseInt(String.valueOf(val));
+            contratoSeleccionado = porId.get(id);
+            dispose();
+        } catch (Exception ex) {
+            contratoSeleccionado = null;
+            JOptionPane.showMessageDialog(this, "No fue posible seleccionar el contrato.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -32,7 +124,7 @@ public class FrmBuscarContrato extends javax.swing.JInternalFrame {
         jLabel3 = new javax.swing.JLabel();
         txtNombre = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblClientes = new javax.swing.JTable();
+        tblContrato = new javax.swing.JTable();
         btnAceptar = new javax.swing.JButton();
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
@@ -62,9 +154,9 @@ public class FrmBuscarContrato extends javax.swing.JInternalFrame {
             }
         });
 
-        tblClientes.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
-        tblClientes.setFont(new java.awt.Font("sansserif", 1, 14)); // NOI18N
-        tblClientes.setModel(new javax.swing.table.DefaultTableModel(
+        tblContrato.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
+        tblContrato.setFont(new java.awt.Font("sansserif", 1, 14)); // NOI18N
+        tblContrato.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
@@ -75,7 +167,7 @@ public class FrmBuscarContrato extends javax.swing.JInternalFrame {
                 "Numero Contrato", "Cliente", "Vehiculo", "Fecha Inicio", "Fecha Fin", "Estado", "Monto Calculado"
             }
         ));
-        jScrollPane1.setViewportView(tblClientes);
+        jScrollPane1.setViewportView(tblContrato);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -166,7 +258,7 @@ public class FrmBuscarContrato extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tblClientes;
+    private javax.swing.JTable tblContrato;
     private javax.swing.JTextField txtNombre;
     // End of variables declaration//GEN-END:variables
 }

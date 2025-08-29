@@ -4,6 +4,9 @@
  */
 package Vista;
 
+import Modelo.Reserva;
+import java.time.format.DateTimeFormatter;
+
 /**
  *
  * @author Luisk
@@ -16,7 +19,64 @@ public class FrmReserva extends javax.swing.JInternalFrame {
     public FrmReserva() {
         initComponents();
     }
+     public javax.swing.JButton getBtnSave()    { return btnSave; }
+    public javax.swing.JButton getBtnUpdate()  { return btnUpdate; }
+    public javax.swing.JButton getBtnEliminar(){ return btnEliminar; }
+    public javax.swing.JButton getBtnSearch()  { return btnSearch; }
+    public javax.swing.JButton getBtnClear()   { return btnClear; }
 
+
+    /// ====== Helpers de campos ======
+    public String getNumeroReservaText() { return txtId1.getText().trim(); }
+    public String getCedulaCliente()     { return txtId2.getText().trim(); }
+
+    // Combo usándose para TIPOS
+    public String getTipoSeleccionado()  { return (String) txtPuesto4.getSelectedItem(); }
+
+    public String getFechaInicioText()   { return txtBirthdate.getText().trim(); } // dd/MM/yyyy
+    public String getFechaFinText()      { return txtBirthdate1.getText().trim(); }
+
+    public void setNumeroReserva(int id) { txtId1.setText(String.valueOf(id)); }
+    public void setCedulaCliente(String ced) { txtId2.setText(ced == null ? "" : ced.trim()); }
+
+    public void setTipos(java.util.List<String> tipos){
+        txtPuesto4.removeAllItems();
+        if (tipos != null) for (String i : tipos) txtPuesto4.addItem(i);
+        if (txtPuesto4.getItemCount() > 0) txtPuesto4.setSelectedIndex(0);
+    }
+
+    public void setReservaToForm(Reserva r) {
+        if (r == null) return;
+
+        setNumeroReserva(r.getId());
+        setCedulaCliente(r.getCliente() != null ? r.getCliente().getCedula() : "");
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        if (r.getInicio() != null) txtBirthdate.setText(fmt.format(r.getInicio()));
+        if (r.getFin()    != null) txtBirthdate1.setText(fmt.format(r.getFin()));
+
+        String tipoTxt = (r.getVehiculo() != null)
+                ? r.getVehiculo().getTipo().name()
+                : (r.getTipoSolicitado() != null ? r.getTipoSolicitado().name() : null);
+        if (tipoTxt != null) {
+            boolean found = false;
+            for (int i = 0; i < txtPuesto4.getItemCount(); i++) {
+                if (tipoTxt.equals(txtPuesto4.getItemAt(i))) { found = true; break; }
+            }
+            if (!found) txtPuesto4.addItem(tipoTxt);
+            txtPuesto4.setSelectedItem(tipoTxt);
+        }
+    }
+
+    public void clearForm(){
+        txtId1.setText("");
+        txtId2.setText("");
+        if (txtPuesto4.getItemCount() > 0) txtPuesto4.setSelectedIndex(0);
+        txtBirthdate.setText("");
+        txtBirthdate1.setText("");
+        jComboBox2.setSelectedIndex(0);
+        txtId3.setText("");
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -49,6 +109,8 @@ public class FrmReserva extends javax.swing.JInternalFrame {
         txtBirthdate1 = new javax.swing.JFormattedTextField();
         txtId3 = new javax.swing.JTextField();
 
+        setClosable(true);
+
         jPanel1.setBackground(new java.awt.Color(51, 51, 51));
 
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/3floppy_unmount (4).png"))); // NOI18N
@@ -65,6 +127,11 @@ public class FrmReserva extends javax.swing.JInternalFrame {
         btnSearch.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/deskbar-applet.png"))); // NOI18N
         btnSearch.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
 
         btnClear.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/application_vnd.oasis.opendocument.spreadsheet (4).png"))); // NOI18N
@@ -114,7 +181,7 @@ public class FrmReserva extends javax.swing.JInternalFrame {
         txtId1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         txtBirthdate.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        txtBirthdate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/YYYY"))));
+        txtBirthdate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/yyyy"))));
         txtBirthdate.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         txtBirthdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -154,7 +221,7 @@ public class FrmReserva extends javax.swing.JInternalFrame {
         jLabel20.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
         txtBirthdate1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        txtBirthdate1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/YYYY"))));
+        txtBirthdate1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/yyyy"))));
         txtBirthdate1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         txtBirthdate1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -218,21 +285,17 @@ public class FrmReserva extends javax.swing.JInternalFrame {
                         .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtId1)
-                            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(txtPuesto4, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
-                                .addComponent(txtId2)))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel20)
-                            .addComponent(jLabel16)))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel19)
-                            .addComponent(jLabel18))))
+                    .addComponent(txtId1)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtPuesto4, javax.swing.GroupLayout.PREFERRED_SIZE, 34, Short.MAX_VALUE)
+                        .addComponent(txtId2)))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel20)
+                        .addComponent(jLabel16)
+                        .addComponent(jLabel19))
+                    .addComponent(jLabel18))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -308,6 +371,10 @@ public class FrmReserva extends javax.swing.JInternalFrame {
     private void txtBirthdate1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBirthdate1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtBirthdate1ActionPerformed
+
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnSearchActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

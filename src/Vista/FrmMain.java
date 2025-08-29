@@ -5,13 +5,23 @@
 package Vista;
 
 import Controlador.ClienteController;
+import Controlador.ContratoController;
+import Controlador.ReservaController;
 import Controlador.VehiculoController;
+import Lists.ContratoList;
+import Lists.ReservaLista;
+import Lists.ReservaQueue;
 import Lists.clienteList;
 import Lists.vehiculoList;
+import Modelo.ContratoManager;
 import java.awt.Dimension;
 import Lists.empleadoList;
 import Vista.FrmEmpleado;
 import Controlador.EmpleadoController;
+import Vista.FrmCliente;
+import Vista.FrmContratos;
+import Vista.FrmReserva;
+import Vista.FrmVehiculo;
 
 
 /**
@@ -19,39 +29,61 @@ import Controlador.EmpleadoController;
  * @author ilope
  */
 public class FrmMain extends javax.swing.JFrame {
-    private clienteList repoClientes;       // repositorio
-    private FrmCliente frmCliente;  // formulario
-    private ClienteController controllerClientes; // controlador
-    private vehiculoList repoVehiculos;
-    private FrmVehiculo frmVehiculo;
+
+    // ===== Repos =====
+    private clienteList   repoClientes;
+    private vehiculoList  repoVehiculos;
+    private ReservaLista  reservas;
+    private ReservaQueue  cola;
+    private ContratoList  repoContratos;
+    private empleadoList  repoEmpleados;
+
+    // ===== Vistas =====
+    private FrmCliente    frmCliente;
+    private FrmVehiculo   frmVehiculo;
+    private FrmReserva    frmReserva;
+    private FrmContratos  frmContratos;
+    private FrmEmpleado   frmEmpleado;
+
+    // ===== Controladores =====
+    private ClienteController  controllerClientes;
     private VehiculoController controllerVehiculos;
-    private empleadoList repoEmpleados;
-    private FrmEmpleado frmEmpleado;
+    private ReservaController  controllerReservas;
+    private ContratoController controllerContratos;
     private EmpleadoController controllerEmpleados;
-    
 
     /**
      * Creates new form FrmMain
      */
     public FrmMain() {
-        initComponents();
         setLocationRelativeTo(null);
-        repoClientes = new clienteList();
-        frmCliente = new FrmCliente();
-        controllerClientes = new ClienteController(frmCliente, repoClientes);
 
-        // Vehículos
-        repoVehiculos = new vehiculoList();
-        frmVehiculo = new FrmVehiculo();
-        controllerVehiculos = new VehiculoController(repoVehiculos, frmVehiculo);
-        
-        // Empleados
-        repoEmpleados = new empleadoList();
-        frmEmpleado   = new FrmEmpleado();
-        controllerEmpleados = new EmpleadoController(repoEmpleados, frmEmpleado);
+        // ===== Repos =====
+        repoClientes   = new clienteList();
+        repoVehiculos  = new vehiculoList();
+        reservas       = new ReservaLista();
+        cola           = new ReservaQueue();
+        repoContratos  = new ContratoList();
+        repoEmpleados  = new empleadoList();
 
+        // ===== Vistas =====
+        frmCliente     = new FrmCliente();
+        frmVehiculo    = new FrmVehiculo();
+        frmReserva     = new FrmReserva();
+        frmContratos   = new FrmContratos();
+        frmEmpleado    = new FrmEmpleado();
+
+        // ===== Controladores =====
+        controllerClientes   = new ClienteController(frmCliente, repoClientes);
+        controllerVehiculos  = new VehiculoController(repoVehiculos, frmVehiculo);
+        controllerReservas   = new ReservaController(repoClientes, repoVehiculos, reservas, cola, frmReserva);
+        controllerContratos  = new ContratoController(repoClientes, repoVehiculos, reservas, repoContratos, frmContratos);
+        controllerEmpleados  = new EmpleadoController(repoEmpleados, frmEmpleado);
     }
     
+    
+    
+         
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -65,7 +97,7 @@ public class FrmMain extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         btnClientes = new javax.swing.JButton();
         btnVehiculos = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        btnReserva = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         btnEmpleado = new javax.swing.JButton();
 
@@ -102,11 +134,21 @@ public class FrmMain extends javax.swing.JFrame {
         jDesktopPane1.add(btnVehiculos);
         btnVehiculos.setBounds(750, 890, 130, 100);
 
-        jButton3.setText("jButton3");
-        jDesktopPane1.add(jButton3);
-        jButton3.setBounds(920, 890, 130, 100);
+        btnReserva.setText("jButton3");
+        btnReserva.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReservaActionPerformed(evt);
+            }
+        });
+        jDesktopPane1.add(btnReserva);
+        btnReserva.setBounds(920, 890, 130, 100);
 
         jButton4.setText("jButton4");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
         jDesktopPane1.add(jButton4);
         jButton4.setBounds(1090, 890, 140, 100);
 
@@ -154,9 +196,19 @@ public class FrmMain extends javax.swing.JFrame {
         abrirInternal(frmVehiculo);
     }//GEN-LAST:event_btnVehiculosActionPerformed
 
+
     private void btnEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEmpleadoActionPerformed
         abrirInternal(frmEmpleado);
     }//GEN-LAST:event_btnEmpleadoActionPerformed
+
+    private void btnReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReservaActionPerformed
+        abrirInternal(frmReserva);
+    }//GEN-LAST:event_btnReservaActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        abrirInternal(frmContratos);
+    }//GEN-LAST:event_jButton4ActionPerformed
+
 
     /**
      * @param args the command line arguments
@@ -187,7 +239,6 @@ public class FrmMain extends javax.swing.JFrame {
     private javax.swing.JButton btnClientes;
     private javax.swing.JButton btnEmpleado;
     private javax.swing.JButton btnVehiculos;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JLabel jLabel1;

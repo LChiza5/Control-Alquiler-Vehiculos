@@ -11,44 +11,37 @@ import java.time.LocalDate;
  *
  * @author ilope
  */
-public class Contrato extends RegistroTemp{
-    private int id;
-    private Cliente cliente;
-    private Vehiculo vehiculo;
-    private double monto;
+public class Contrato {
+    private final int id;
+    private final Cliente cliente;
+    private final Vehiculo vehiculo;
+    private final LocalDate inicio;
+    private final LocalDate fin;
+    private final double tarifaDiaria;
+    private double monto;               // tarifaDiaria * dias
     private EstadoContrato estado;
-    
-    public Contrato(int id, Cliente cliente, Vehiculo vehiculo,LocalDate inicio, LocalDate fin, double monto, EstadoContrato estado) {
-    super(inicio, fin);
-    this.id = id; this.cliente = cliente; this.vehiculo = vehiculo;
-    this.monto = monto; this.estado = estado;
-  }
 
-    public int getId() {
-        return id;
-    }
-
-    public Cliente getCliente() {
-        return cliente;
+    public Contrato(int id, Cliente cliente, Vehiculo vehiculo,
+                    LocalDate inicio, LocalDate fin, double tarifaDiaria,
+                    EstadoContrato estado) {
+        this.id = id;
+        this.cliente = cliente;
+        this.vehiculo = vehiculo;
+        this.inicio = inicio;
+        this.fin = fin;
+        this.tarifaDiaria = tarifaDiaria;
+        this.estado = estado;
     }
 
-    public Vehiculo getVehiculo() {
-        return vehiculo;
-    }
+    public int getId() { return id; }
+    public Cliente getCliente() { return cliente; }
+    public Vehiculo getVehiculo() { return vehiculo; }
+    public LocalDate getInicio() { return inicio; }
+    public LocalDate getFin() { return fin; }
+    public double getTarifaDiaria() { return tarifaDiaria; }
+    public double getMonto() { return monto; }
+    public EstadoContrato getEstado() { return estado; }
 
-    public double getMonto() {
-        return monto;
-    }
-
-    public EstadoContrato getEstado() {
-        return estado;
-    }
-    @Override public String toString(){
-    return "Contrato{id=%d, placa=%s, estado=%s, dias=%d}".formatted(
-        id, vehiculo!=null?vehiculo.getPlaca():"-", estado, getDias());
-    }
-
-    void setEstado(EstadoContrato estadoContrato) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-}  
+    public void setEstado(EstadoContrato estado) { this.estado = estado; }
+    public void setMonto(double monto) { this.monto = monto; }
+}

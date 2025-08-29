@@ -4,17 +4,59 @@
  */
 package Vista;
 
+import Modelo.Cliente;
+import Modelo.Reserva;
+import Modelo.Vehiculo;
+import java.awt.Frame;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JOptionPane;
+import javax.swing.RowFilter;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
+
 /**
  *
  * @author Luisk
  */
-public class FrmBuscarReserva extends javax.swing.JInternalFrame {
+public class FrmBuscarReserva extends javax.swing.JDialog {
+    private java.util.List<Reserva> data = new ArrayList<>();
+    private final Map<Integer, Reserva> porId = new HashMap<>();
+    private Reserva reservaSeleccionada;
+    private DefaultTableModel model;
+    private TableRowSorter<DefaultTableModel> sorter;
 
     /**
      * Creates new form FrmBuscarReserva
      */
-    public FrmBuscarReserva() {
-        initComponents();
+    public FrmBuscarReserva(Frame parent, boolean modal) {
+        super(parent, modal);            // <- primero el super
+        initComponents();                // <- luego construir UI
+
+        // modelo + sorter
+        model  = (DefaultTableModel) tblReserva.getModel();
+        sorter = new TableRowSorter<>(model);
+        tblReserva.setRowSorter(sorter);
+
+        // filtro live
+        txtBuscar.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { aplicarFiltro(); }
+            public void removeUpdate(DocumentEvent e) { aplicarFiltro(); }
+            public void changedUpdate(DocumentEvent e) { aplicarFiltro(); }
+        });
+
+        // doble click = aceptar
+        tblReserva.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    aceptar();
+                }
+            }
+        });
+
     }
 
     /**
@@ -29,10 +71,10 @@ public class FrmBuscarReserva extends javax.swing.JInternalFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        txtNombre = new javax.swing.JTextField();
+        txtBuscar = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblClientes = new javax.swing.JTable();
+        tblReserva = new javax.swing.JTable();
         btnAceptar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
 
@@ -52,11 +94,11 @@ public class FrmBuscarReserva extends javax.swing.JInternalFrame {
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel3.setText("Buscar");
 
-        txtNombre.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        txtNombre.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
-        txtNombre.addActionListener(new java.awt.event.ActionListener() {
+        txtBuscar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtBuscar.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true));
+        txtBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtNombreenter(evt);
+                txtBuscarenter(evt);
             }
         });
 
@@ -67,9 +109,9 @@ public class FrmBuscarReserva extends javax.swing.JInternalFrame {
         jLabel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        tblClientes.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
-        tblClientes.setFont(new java.awt.Font("sansserif", 1, 14)); // NOI18N
-        tblClientes.setModel(new javax.swing.table.DefaultTableModel(
+        tblReserva.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
+        tblReserva.setFont(new java.awt.Font("sansserif", 1, 14)); // NOI18N
+        tblReserva.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
@@ -88,7 +130,7 @@ public class FrmBuscarReserva extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(tblClientes);
+        jScrollPane1.setViewportView(tblReserva);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -100,7 +142,7 @@ public class FrmBuscarReserva extends javax.swing.JInternalFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtNombre)
+                    .addComponent(txtBuscar)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addGap(0, 0, Short.MAX_VALUE))
@@ -113,7 +155,7 @@ public class FrmBuscarReserva extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE))
         );
@@ -168,18 +210,81 @@ public class FrmBuscarReserva extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    
+    
+    // ===== API que llama el controlador
+   public void setResultados(java.util.List<Reserva> items) {
+        data.clear();
+        porId.clear();
+        if (items != null) data.addAll(items);
+        for (Reserva r : data) porId.put(r.getId(), r);
+        loadTable();
+    }
 
+    public Reserva getReservaSeleccionada() {
+        return reservaSeleccionada;
+    }
+
+    // ========== Helpers ==========
+    private void loadTable() {
+        model.setRowCount(0);
+        for (Reserva r : data) {
+            Cliente c = r.getCliente();
+            Vehiculo v = r.getVehiculo();
+
+            String num   = String.valueOf(r.getId());
+            String cli   = (c == null ? "" : c.getNombre() + (c.getCedula() != null ? " (" + c.getCedula() + ")" : ""));
+            String vehOTipo = (v == null)
+                    ? "(EN ESPERA) " + (r.getTipoSolicitado() != null ? r.getTipoSolicitado().name() : "")
+                    : v.getPlaca() + " / " + (v.getTipo() != null ? v.getTipo().name() : "");
+            String ini   = (r.getInicio() == null ? "" : r.getInicio().toString());
+            String fin   = (r.getFin() == null ? "" : r.getFin().toString());
+            String est   = (r.getEstado() == null ? "" : r.getEstado());
+            String monto = ""; // si más adelante calculas monto
+
+            model.addRow(new Object[]{ num, cli, vehOTipo, ini, fin, est, monto });
+        }
+        if (model.getRowCount() > 0) {
+            tblReserva.setRowSelectionInterval(0, 0);
+        }
+    }
+
+    private void aplicarFiltro() {
+        String text = txtBuscar.getText();
+        if (text == null || text.trim().isEmpty()) {
+            sorter.setRowFilter(null);
+        } else {
+            sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+        }
+    }
+
+    private void aceptar() {
+        int viewRow = tblReserva.getSelectedRow();
+        if (viewRow == -1) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar una reserva", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        int modelRow = tblReserva.convertRowIndexToModel(viewRow);
+        Object val = model.getValueAt(modelRow, 0); // columna 0 = Numero
+        try {
+            int id = Integer.parseInt(String.valueOf(val));
+            reservaSeleccionada = porId.get(id);
+        } catch (Exception ex) {
+            reservaSeleccionada = null;
+        }
+        dispose();
+    }
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
-
+        aceptar();
     }//GEN-LAST:event_btnAceptarActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-
+        reservaSeleccionada = null; dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
-    private void txtNombreenter(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreenter
-
-    }//GEN-LAST:event_txtNombreenter
+    private void txtBuscarenter(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarenter
+         aplicarFiltro();
+    }//GEN-LAST:event_txtBuscarenter
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -190,7 +295,7 @@ public class FrmBuscarReserva extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tblClientes;
-    private javax.swing.JTextField txtNombre;
+    private javax.swing.JTable tblReserva;
+    private javax.swing.JTextField txtBuscar;
     // End of variables declaration//GEN-END:variables
 }
