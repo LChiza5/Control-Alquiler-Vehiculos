@@ -10,6 +10,76 @@ package Vista;
  */
 public class FrmEmpleado extends javax.swing.JInternalFrame {
 
+public javax.swing.JButton getBtnGuardar()   { return btnGuardar; }   
+public javax.swing.JButton getBtnActualizar(){ return btnActualizar; } 
+public javax.swing.JButton getBtnEliminar()  { return btnEliminar; }   
+public javax.swing.JButton getBtnLimpiar()   { return btnLimpiar; }    
+public javax.swing.JButton getBtnBuscar()    { return btnBuscar; }     
+
+
+private javax.swing.JTextField getTxtId()        { return txtId1; }
+private javax.swing.JTextField getTxtNombre()    { return txtName1; }
+private javax.swing.JFormattedTextField getTxtFechaNac() { return txtBirthdate; } 
+private javax.swing.JComboBox<String> getCbPuesto(){ return txtPuesto1; }
+private javax.swing.JTextField getTxtSalario()   { return txtSalario1; }
+private javax.swing.JTextField getTxtCorreo()    { return txtCorreo; }
+private javax.swing.JTextField getTxtTelefono()  { return txtTelefono; }
+
+public Modelo.Empleado getEmpleadoFromForm() {
+    try {
+        String id        = getTxtId().getText().trim();
+        String nombre    = getTxtNombre().getText().trim();
+        java.time.LocalDate nacimiento;
+    try {
+    String dateText = txtBirthdate.getText().replace("_","").trim();
+    nacimiento = java.time.LocalDate.parse(
+            dateText,
+            java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        );
+    } catch (java.time.format.DateTimeParseException ex) {
+    Utils.UtilGUI.showErrorMessage(this, "Fecha inválida. Use dd/MM/yyyy.", "Error");
+    return null;
+    }
+        String puesto    = (String) getCbPuesto().getSelectedItem();
+        String salarioTx = getTxtSalario().getText().trim();
+        double salario   = salarioTx.isBlank()? 0.0 : Double.parseDouble(salarioTx);
+        String correo    = getTxtCorreo().getText().trim();
+        String telefono  = getTxtTelefono().getText().trim();
+
+        return new Modelo.Empleado(id, nombre, nacimiento, telefono, correo, puesto, salario);
+    } catch (NumberFormatException nfe) {
+        Utils.UtilGUI.showErrorMessage(this, "Salario inválido (solo números).", "Error");
+        return null;
+    } catch (Exception ex) {
+        Utils.UtilGUI.showErrorMessage(this, "Datos incompletos o fecha inválida (dd/MM/yyyy).", "Error");
+        return null;
+    }
+}
+
+public void setEmpleadoToForm(Modelo.Empleado e) {
+    if (e == null) return;
+    getTxtId().setText(e.getCedula());
+    getTxtNombre().setText(e.getNombre());
+    getTxtTelefono().setText(e.getTelefono());
+    getTxtCorreo().setText(e.getCorreo());
+    if (e.getPuesto()!=null) getCbPuesto().setSelectedItem(e.getPuesto());
+    getTxtSalario().setText(String.valueOf(e.getSalario()));
+    if (e.getFechaNac()!=null)
+        getTxtFechaNac().setText(e.getFechaNac().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+    else
+        getTxtFechaNac().setText("");
+}
+
+public void clearForm() {
+    getTxtId().setText("");
+    getTxtNombre().setText("");
+    getTxtFechaNac().setText("");
+    getCbPuesto().setSelectedIndex(0);
+    getTxtSalario().setText("");
+    getTxtCorreo().setText("");
+    getTxtTelefono().setText("");
+}
+        
     /**
      * Creates new form FrmEmpleado
      */
@@ -27,11 +97,11 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        btnSave = new javax.swing.JButton();
-        btnUpdate = new javax.swing.JButton();
+        btnGuardar = new javax.swing.JButton();
+        btnActualizar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
-        btnSearch = new javax.swing.JButton();
-        btnClear = new javax.swing.JButton();
+        btnBuscar = new javax.swing.JButton();
+        btnLimpiar = new javax.swing.JButton();
         jLabelEmpleados1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
@@ -53,24 +123,24 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
 
         jPanel1.setBackground(new java.awt.Color(204, 204, 204));
 
-        btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/3floppy_unmount (4).png"))); // NOI18N
-        btnSave.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/3floppy_unmount (4).png"))); // NOI18N
+        btnGuardar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        btnUpdate.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnUpdate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/actualizar-flecha.png"))); // NOI18N
-        btnUpdate.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnActualizar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnActualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/actualizar-flecha.png"))); // NOI18N
+        btnActualizar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         btnEliminar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/application_exit (4).png"))); // NOI18N
         btnEliminar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        btnSearch.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/deskbar-applet.png"))); // NOI18N
-        btnSearch.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnBuscar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/deskbar-applet.png"))); // NOI18N
+        btnBuscar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        btnClear.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/application_vnd.oasis.opendocument.spreadsheet (4).png"))); // NOI18N
-        btnClear.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnLimpiar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnLimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/application_vnd.oasis.opendocument.spreadsheet (4).png"))); // NOI18N
+        btnLimpiar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -78,15 +148,15 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnSave, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(197, 197, 197))
         );
         jPanel1Layout.setVerticalGroup(
@@ -94,11 +164,11 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(21, 21, 21)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnSave, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+                    .addComponent(btnGuardar, javax.swing.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
                     .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnUpdate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnLimpiar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnActualizar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(23, Short.MAX_VALUE))
         );
 
@@ -147,7 +217,6 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
         jLabel10.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
         txtPuesto1.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        txtPuesto1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Guia ", "Cuidador" }));
         txtPuesto1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         txtPuesto1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -170,7 +239,7 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
         });
 
         txtBirthdate.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        txtBirthdate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/YYYY"))));
+        txtBirthdate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/yyyy"))));
         txtBirthdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtBirthdateActionPerformed(evt);
@@ -306,11 +375,11 @@ public class FrmEmpleado extends javax.swing.JInternalFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnClear;
+    private javax.swing.JButton btnActualizar;
+    private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnEliminar;
-    private javax.swing.JButton btnSave;
-    private javax.swing.JButton btnSearch;
-    private javax.swing.JButton btnUpdate;
+    private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btnLimpiar;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;

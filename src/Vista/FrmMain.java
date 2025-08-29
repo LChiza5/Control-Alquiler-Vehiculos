@@ -9,8 +9,9 @@ import Controlador.VehiculoController;
 import Lists.clienteList;
 import Lists.vehiculoList;
 import java.awt.Dimension;
-
-
+import Lists.empleadoList;
+import Vista.FrmEmpleado;
+import Controlador.EmpleadoController;
 
 
 /**
@@ -24,6 +25,10 @@ public class FrmMain extends javax.swing.JFrame {
     private vehiculoList repoVehiculos;
     private FrmVehiculo frmVehiculo;
     private VehiculoController controllerVehiculos;
+    private empleadoList repoEmpleados;
+    private FrmEmpleado frmEmpleado;
+    private EmpleadoController controllerEmpleados;
+    
 
     /**
      * Creates new form FrmMain
@@ -39,8 +44,14 @@ public class FrmMain extends javax.swing.JFrame {
         repoVehiculos = new vehiculoList();
         frmVehiculo = new FrmVehiculo();
         controllerVehiculos = new VehiculoController(repoVehiculos, frmVehiculo);
-    
+        
+        // Empleados
+        repoEmpleados = new empleadoList();
+        frmEmpleado   = new FrmEmpleado();
+        controllerEmpleados = new EmpleadoController(repoEmpleados, frmEmpleado);
+
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -56,7 +67,7 @@ public class FrmMain extends javax.swing.JFrame {
         btnVehiculos = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        btnEmpleado = new javax.swing.JButton();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -99,9 +110,14 @@ public class FrmMain extends javax.swing.JFrame {
         jDesktopPane1.add(jButton4);
         jButton4.setBounds(1090, 890, 140, 100);
 
-        jButton5.setText("jButton5");
-        jDesktopPane1.add(jButton5);
-        jButton5.setBounds(1260, 890, 130, 100);
+        btnEmpleado.setText("jButton5");
+        btnEmpleado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEmpleadoActionPerformed(evt);
+            }
+        });
+        jDesktopPane1.add(btnEmpleado);
+        btnEmpleado.setBounds(1260, 890, 130, 100);
 
         getContentPane().add(jDesktopPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -40, 1980, 1020));
 
@@ -138,6 +154,10 @@ public class FrmMain extends javax.swing.JFrame {
         abrirInternal(frmVehiculo);
     }//GEN-LAST:event_btnVehiculosActionPerformed
 
+    private void btnEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEmpleadoActionPerformed
+        abrirInternal(frmEmpleado);
+    }//GEN-LAST:event_btnEmpleadoActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -165,10 +185,10 @@ public class FrmMain extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClientes;
+    private javax.swing.JButton btnEmpleado;
     private javax.swing.JButton btnVehiculos;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables

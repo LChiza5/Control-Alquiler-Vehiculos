@@ -3,18 +3,90 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JInternalFrame.java to edit this template
  */
 package Vista;
+import Lists.empleadoList;
+import Modelo.Empleado;
+import javax.swing.table.DefaultTableModel;
+import java.util.function.Consumer;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
  * @author Luisk
  */
 public class FrmBuscarEmpleado extends javax.swing.JInternalFrame {
+    
+    private empleadoList repo;
+private Consumer<Empleado> onSelect;
 
+// Llama a esto desde el Controller antes de mostrar el frame
+public void setRepository(empleadoList repo) {
+    this.repo = repo;
+    refreshTable();
+}
+
+// El Controller te pasa qué hacer cuando el usuario seleccione un empleado
+public void setOnSelect(Consumer<Empleado> onSelect) {
+    this.onSelect = onSelect;
+}
+
+// Rellena la JTable con los empleados del repositorio
+public void refreshTable() {
+    if (repo == null || tblEmpleados == null) return;
+
+    String[] cols = {"ID", "Nombre", "Nacimiento", "Puesto", "Salario", "Correo", "Teléfono"};
+    DefaultTableModel m = new DefaultTableModel(cols, 0) {
+        @Override public boolean isCellEditable(int r, int c) { return false; }
+    };
+
+    DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    for (Empleado e : repo.listar()) { // requiere getAll() en empleadoList (ver nota abajo)
+        m.addRow(new Object[]{
+            e.getCedula(),
+            e.getNombre(),
+            (e.getFechaNac() == null ? "" : e.getFechaNac().format(fmt)),
+            e.getPuesto(),
+            e.getSalario(),
+            e.getCorreo(),
+            e.getTelefono()
+        });
+    }
+
+    tblEmpleados.setModel(m);
+    tblEmpleados.setAutoCreateRowSorter(true); // ordenar por columnas
+}
+
+// --- Doble clic en la tabla para "devolver" el empleado seleccionado ---
+private void seleccionarDesdeTabla() {
+    int viewRow = tblEmpleados.getSelectedRow();
+    if (viewRow == -1) return;
+
+    int modelRow = tblEmpleados.convertRowIndexToModel(viewRow);
+    String id = (String) tblEmpleados.getModel().getValueAt(modelRow, 0); // Columna 0 = ID
+
+    if (repo != null && onSelect != null) {
+        Empleado emp = repo.find(id);
+        if (emp != null) onSelect.accept(emp);
+    }
+}
+
+private void attachDoubleClick() {
+    tblEmpleados.addMouseListener(new java.awt.event.MouseAdapter() {
+        @Override
+        public void mouseClicked(java.awt.event.MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                seleccionarDesdeTabla();
+            }
+        }
+    });
+}
+    
     /**
      * Creates new form FrmBuscarEmpleado
      */
     public FrmBuscarEmpleado() {
         initComponents();
+        attachDoubleClick();
     }
 
     /**
@@ -31,7 +103,7 @@ public class FrmBuscarEmpleado extends javax.swing.JInternalFrame {
         jLabel3 = new javax.swing.JLabel();
         txtNombre = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tblClientes = new javax.swing.JTable();
+        tblEmpleados = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         btnCancelar = new javax.swing.JButton();
         btnAceptar = new javax.swing.JButton();
@@ -49,9 +121,9 @@ public class FrmBuscarEmpleado extends javax.swing.JInternalFrame {
             }
         });
 
-        tblClientes.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
-        tblClientes.setFont(new java.awt.Font("sansserif", 1, 14)); // NOI18N
-        tblClientes.setModel(new javax.swing.table.DefaultTableModel(
+        tblEmpleados.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
+        tblEmpleados.setFont(new java.awt.Font("sansserif", 1, 14)); // NOI18N
+        tblEmpleados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
@@ -62,7 +134,7 @@ public class FrmBuscarEmpleado extends javax.swing.JInternalFrame {
                 "Cédula", "Nombre", "Fecha Nacimiento", "Puesto", "Salario", "Correo", "Teléfono"
             }
         ));
-        jScrollPane1.setViewportView(tblClientes);
+        jScrollPane1.setViewportView(tblEmpleados);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -175,7 +247,7 @@ public class FrmBuscarEmpleado extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tblClientes;
+    private javax.swing.JTable tblEmpleados;
     private javax.swing.JTextField txtNombre;
     // End of variables declaration//GEN-END:variables
 }
