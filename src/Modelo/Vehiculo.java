@@ -13,62 +13,45 @@ import java.util.Objects;
  * @author ilope
  */
 public class Vehiculo {
-    private String placa, marca;
+    private String placa;
+    private String marca;
+    private String modelo;
     private int anio;
-    private TipoVehiculo modelo;
+    private TipoVehiculo tipo;
     private EstadoVehiculo estado;
 
-    public String getPlaca() {
-        return placa;
-    }
-
-    public String getMarca() {
-        return marca;
-    }
-
-    public TipoVehiculo getModelo() {
-        return modelo;
-    }
-
-    public int getAnio() {
-        return anio;
-    }
-
-    
-
-    public EstadoVehiculo getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EstadoVehiculo estado) {
-        this.estado = estado;
-    }
-
-    public Vehiculo(String placa, String marca, TipoVehiculo modelo, int anio, EstadoVehiculo estado) {
+    public Vehiculo(String placa, String marca, String modelo, int anio, TipoVehiculo tipo, EstadoVehiculo estado) {
         this.placa = placa;
         this.marca = marca;
         this.modelo = modelo;
         this.anio = anio;
+        this.tipo = tipo;
         this.estado = estado;
     }
-    
-    public boolean equals(Object o){ 
-        return o instanceof Vehiculo v && placa != null && placa.equals(v.placa); 
-    }
-    
-    @Override 
-    public int hashCode(){ 
-        return Objects.hash(placa); 
-    }
-    
+
+    // Getters
+    public String getPlaca() { return placa; }
+    public String getMarca() { return marca; }
+    public String getModelo() { return modelo; }
+    public int getAnio() { return anio; }
+    public TipoVehiculo getTipo() { return tipo; }
+    public EstadoVehiculo getEstado() { return estado; }
+
+    // Setters
+    public void setModelo(String modelo) { this.modelo = modelo; }
+    public void setTipo(TipoVehiculo tipo) { this.tipo = tipo; }
+    public void setEstado(EstadoVehiculo estado) { this.estado = estado; }
+
     @Override
-    public String toString(){ 
-        return "Vehiculo{placa='%s', modelo='%s'}".formatted(placa,modelo); 
+    public boolean equals(Object o) {
+        return o instanceof Vehiculo v && placa != null && placa.equals(v.placa);
     }
+    @Override
+    public int hashCode() { return Objects.hash(placa); }
 
-    public void setModelo(TipoVehiculo modelo) {
-        this.modelo = modelo;
+    @Override
+    public String toString() {
+        return "Vehiculo{placa='%s', marca='%s', modelo='%s', anio=%d, tipo=%s, estado=%s}"
+                .formatted(placa, marca, modelo, anio, tipo, estado);
     }
-
-   
 }

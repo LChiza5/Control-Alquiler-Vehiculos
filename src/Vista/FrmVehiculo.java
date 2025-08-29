@@ -4,18 +4,36 @@
  */
 package Vista;
 
+import Enums.EstadoVehiculo;
+import Enums.TipoVehiculo;
+import Modelo.Vehiculo;
+import javax.swing.ComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+
 /**
  *
  * @author Luisk
  */
 public class FrmVehiculo extends javax.swing.JInternalFrame {
+    
 
     /**
      * Creates new form FrmVehiculo
      */
     public FrmVehiculo() {
         initComponents();
+        cbTipo.removeAllItems();
+for (TipoVehiculo t : TipoVehiculo.values()) {
+    cbTipo.addItem(t.name()); // usa los nombres como String
+}
+
+cbEstado.removeAllItems();
+for (EstadoVehiculo e : EstadoVehiculo.values()) {
+    cbEstado.addItem(e.name());
+}
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -33,20 +51,22 @@ public class FrmVehiculo extends javax.swing.JInternalFrame {
         jLabel4 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        txtPuesto1 = new javax.swing.JComboBox<>();
-        txtId1 = new javax.swing.JTextField();
-        txtBirthdate = new javax.swing.JFormattedTextField();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jComboBox2 = new javax.swing.JComboBox<>();
+        cbTipo = cbTipo = new javax.swing.JComboBox<>();
+        txtPlaca = new javax.swing.JTextField();
+        cbMarca = new javax.swing.JComboBox<>();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jComboBox3 = new javax.swing.JComboBox<>();
+        cbModelo = new javax.swing.JComboBox<>();
         jLabel10 = new javax.swing.JLabel();
+        cbEstado = new javax.swing.JComboBox<>();
+        txtAnio = new javax.swing.JFormattedTextField();
         btnSave = new javax.swing.JButton();
         btnUpdate = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
         btnSearch = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
+
+        setClosable(true);
 
         jPanel1.setBackground(new java.awt.Color(51, 51, 51));
 
@@ -82,30 +102,19 @@ public class FrmVehiculo extends javax.swing.JInternalFrame {
         jLabel9.setText("Año");
         jLabel9.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        txtPuesto1.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        txtPuesto1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SUV", "SEDAN", "PICK-UP" }));
-        txtPuesto1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        txtPuesto1.addActionListener(new java.awt.event.ActionListener() {
+        cbTipo.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        cbTipo.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        cbTipo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtPuesto1ActionPerformed(evt);
+                cbTipoActionPerformed(evt);
             }
         });
 
-        txtId1.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        txtId1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        txtPlaca.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        txtPlaca.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        txtBirthdate.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        txtBirthdate.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/YYYY"))));
-        txtBirthdate.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        txtBirthdate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtBirthdateActionPerformed(evt);
-            }
-        });
-
-        jComboBox1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-
-        jComboBox2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        cbMarca.setEditable(true);
+        cbMarca.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         jLabel6.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(0, 0, 0));
@@ -115,11 +124,23 @@ public class FrmVehiculo extends javax.swing.JInternalFrame {
         jLabel7.setForeground(new java.awt.Color(0, 0, 0));
         jLabel7.setText("Modelo");
 
-        jComboBox3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        cbModelo.setEditable(true);
+        cbModelo.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         jLabel10.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(0, 0, 0));
         jLabel10.setText("Estado");
+
+        try {
+            txtAnio.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("####")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+        txtAnio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtAnioActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -137,24 +158,26 @@ public class FrmVehiculo extends javax.swing.JInternalFrame {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtId1, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(79, 79, 79)
+                                .addComponent(cbMarca, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtPlaca, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel9)
-                            .addComponent(txtBirthdate, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(33, 33, 33)
-                                .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(91, 91, 91)))
+                                .addGap(130, 130, 130)
+                                .addComponent(cbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(79, 79, 79)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel9)
+                                    .addComponent(txtAnio, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(124, 124, 124)))
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(txtPuesto1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cbTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel8))
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jLabel7)
-                        .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(cbModelo, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(118, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -166,24 +189,30 @@ public class FrmVehiculo extends javax.swing.JInternalFrame {
                     .addComponent(jLabel8))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtPuesto1, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
-                    .addComponent(txtBirthdate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtId1))
+                    .addComponent(cbTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 29, Short.MAX_VALUE)
+                    .addComponent(txtPlaca)
+                    .addComponent(txtAnio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel10)
-                    .addComponent(jLabel7))
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel6)
+                        .addComponent(jLabel7)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(30, 30, 30))
+                    .addComponent(cbMarca, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbModelo, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbEstado, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(33, 33, 33))
         );
 
         btnSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/3floppy_unmount (4).png"))); // NOI18N
         btnSave.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
 
         btnUpdate.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnUpdate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/actualizar-flecha.png"))); // NOI18N
@@ -200,6 +229,11 @@ public class FrmVehiculo extends javax.swing.JInternalFrame {
         btnClear.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/application_vnd.oasis.opendocument.spreadsheet (4).png"))); // NOI18N
         btnClear.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -238,7 +272,7 @@ public class FrmVehiculo extends javax.swing.JInternalFrame {
                     .addComponent(btnClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -255,13 +289,94 @@ public class FrmVehiculo extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtPuesto1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPuesto1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtPuesto1ActionPerformed
 
-    private void txtBirthdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBirthdateActionPerformed
+     public Vehiculo getVehiculoFromForm() {
+    try {
+        String placa = txtPlaca.getText().trim();
+        String marca = getOrAddItem(cbMarca);
+        String modelo = getOrAddItem(cbModelo);
+        String anioTxt = txtAnio.getText().trim();
+
+        if (placa.isEmpty() || marca.isEmpty() || modelo.isEmpty() || anioTxt.isEmpty()) {
+            return null; // faltan datos
+        }
+
+        int anio = Integer.parseInt(anioTxt);
+        TipoVehiculo tipo = TipoVehiculo.valueOf(cbTipo.getSelectedItem().toString());
+        EstadoVehiculo estado = EstadoVehiculo.valueOf(cbEstado.getSelectedItem().toString());
+
+        return new Vehiculo(placa, marca, modelo, anio, tipo, estado);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+    }
+}
+
+    public void setVehiculoToForm(Vehiculo v) {
+        if (v == null) return;
+        txtPlaca.setText(v.getPlaca());
+        cbMarca.setSelectedItem(v.getMarca());
+        cbModelo.setSelectedItem(v.getModelo());
+        txtAnio.setText(String.valueOf(v.getAnio()));
+        cbTipo.setSelectedItem(v.getTipo());
+        cbEstado.setSelectedItem(v.getEstado());
+    }
+
+    public void clearForm() {
+        txtPlaca.setText("");
+        txtAnio.setText("");
+        cbMarca.setSelectedIndex(0);
+        cbModelo.setSelectedIndex(0);
+        cbTipo.setSelectedIndex(0);
+        cbEstado.setSelectedIndex(0);
+    }
+
+    // 🔑 Si usuario escribe en combo algo nuevo, se agrega
+    private String getOrAddItem(JComboBox<String> combo) {
+    String value = combo.getEditor().getItem().toString().trim();
+    if (value.isEmpty()) return "";
+    ComboBoxModel<String> model = combo.getModel();
+    boolean exists = false;
+    for (int i = 0; i < model.getSize(); i++) {
+        if (value.equalsIgnoreCase(model.getElementAt(i))) {
+            exists = true;
+            combo.setSelectedIndex(i);
+            break;
+        }
+    }
+    if (!exists) {
+        combo.addItem(value);
+        combo.setSelectedItem(value);
+    }
+    return value;
+}
+
+    // Getters de botones
+    public JButton getBtnSave() { return btnSave; }
+    public JButton getBtnUpdate() { return btnUpdate; }
+    public JButton getBtnEliminar() { return btnEliminar; }
+    public JButton getBtnSearch() { return btnSearch; }
+    public JButton getBtnClear() { return btnClear; }
+
+    
+       
+
+    private void cbTipoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbTipoActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtBirthdateActionPerformed
+    }//GEN-LAST:event_cbTipoActionPerformed
+
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void txtAnioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAnioActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAnioActionPerformed
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        clearForm();
+    }//GEN-LAST:event_btnClearActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -270,9 +385,10 @@ public class FrmVehiculo extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnUpdate;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
-    private javax.swing.JComboBox<String> jComboBox3;
+    private javax.swing.JComboBox<String> cbEstado;
+    private javax.swing.JComboBox<String> cbMarca;
+    private javax.swing.JComboBox<String> cbModelo;
+    private javax.swing.JComboBox<String> cbTipo;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel6;
@@ -283,8 +399,7 @@ public class FrmVehiculo extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JFormattedTextField txtBirthdate;
-    private javax.swing.JTextField txtId1;
-    private javax.swing.JComboBox<String> txtPuesto1;
+    private javax.swing.JFormattedTextField txtAnio;
+    private javax.swing.JTextField txtPlaca;
     // End of variables declaration//GEN-END:variables
 }

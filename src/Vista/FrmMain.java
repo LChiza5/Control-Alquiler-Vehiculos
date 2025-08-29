@@ -5,7 +5,9 @@
 package Vista;
 
 import Controlador.ClienteController;
+import Controlador.VehiculoController;
 import Lists.clienteList;
+import Lists.vehiculoList;
 import java.awt.Dimension;
 
 
@@ -16,20 +18,27 @@ import java.awt.Dimension;
  * @author ilope
  */
 public class FrmMain extends javax.swing.JFrame {
-    private clienteList repo;       // repositorio
+    private clienteList repoClientes;       // repositorio
     private FrmCliente frmCliente;  // formulario
-    private ClienteController controller; // controlador
+    private ClienteController controllerClientes; // controlador
+    private vehiculoList repoVehiculos;
+    private FrmVehiculo frmVehiculo;
+    private VehiculoController controllerVehiculos;
+
     /**
      * Creates new form FrmMain
      */
     public FrmMain() {
         initComponents();
         setLocationRelativeTo(null);
-        repo = new clienteList();
-    frmCliente = new FrmCliente();
+        repoClientes = new clienteList();
+        frmCliente = new FrmCliente();
+        controllerClientes = new ClienteController(frmCliente, repoClientes);
 
-    // Controlador (pasa SIEMPRE el mismo repo y la misma vista)
-    controller = new ClienteController(frmCliente, repo);
+        // Vehículos
+        repoVehiculos = new vehiculoList();
+        frmVehiculo = new FrmVehiculo();
+        controllerVehiculos = new VehiculoController(repoVehiculos, frmVehiculo);
     
     }
 
@@ -44,7 +53,7 @@ public class FrmMain extends javax.swing.JFrame {
         jDesktopPane1 = new javax.swing.JDesktopPane();
         jLabel1 = new javax.swing.JLabel();
         btnClientes = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnVehiculos = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
@@ -54,7 +63,7 @@ public class FrmMain extends javax.swing.JFrame {
                 exitForm(evt);
             }
         });
-        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jDesktopPane1.setForeground(new java.awt.Color(0, 0, 0));
 
@@ -73,9 +82,14 @@ public class FrmMain extends javax.swing.JFrame {
         jDesktopPane1.add(btnClientes);
         btnClientes.setBounds(570, 890, 140, 100);
 
-        jButton2.setText("jButton2");
-        jDesktopPane1.add(jButton2);
-        jButton2.setBounds(750, 890, 130, 100);
+        btnVehiculos.setText("jButton2");
+        btnVehiculos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVehiculosActionPerformed(evt);
+            }
+        });
+        jDesktopPane1.add(btnVehiculos);
+        btnVehiculos.setBounds(750, 890, 130, 100);
 
         jButton3.setText("jButton3");
         jDesktopPane1.add(jButton3);
@@ -89,7 +103,7 @@ public class FrmMain extends javax.swing.JFrame {
         jDesktopPane1.add(jButton5);
         jButton5.setBounds(1260, 890, 130, 100);
 
-        add(jDesktopPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -40, 1980, 1020));
+        getContentPane().add(jDesktopPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -40, 1980, 1020));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -97,7 +111,7 @@ public class FrmMain extends javax.swing.JFrame {
     /**
      * Exit the Application
      */
-    private void abrirInternal(FrmCliente f) {
+    private void abrirInternal(javax.swing.JInternalFrame f) {
     jDesktopPane1.add(f);
     f.setVisible(true);
     try {
@@ -119,6 +133,10 @@ public class FrmMain extends javax.swing.JFrame {
     private void btnClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientesActionPerformed
          abrirInternal(frmCliente);
     }//GEN-LAST:event_btnClientesActionPerformed
+
+    private void btnVehiculosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVehiculosActionPerformed
+        abrirInternal(frmVehiculo);
+    }//GEN-LAST:event_btnVehiculosActionPerformed
 
     /**
      * @param args the command line arguments
@@ -147,7 +165,7 @@ public class FrmMain extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClientes;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton btnVehiculos;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
