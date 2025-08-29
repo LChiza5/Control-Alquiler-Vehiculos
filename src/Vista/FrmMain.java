@@ -97,7 +97,7 @@ public class FrmMain extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         btnClientes = new javax.swing.JButton();
         btnVehiculos = new javax.swing.JButton();
-        btnReserva = new javax.swing.JButton();
+        btnReserv = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         btnEmpleado = new javax.swing.JButton();
 
@@ -134,14 +134,14 @@ public class FrmMain extends javax.swing.JFrame {
         jDesktopPane1.add(btnVehiculos);
         btnVehiculos.setBounds(750, 890, 130, 100);
 
-        btnReserva.setText("jButton3");
-        btnReserva.addActionListener(new java.awt.event.ActionListener() {
+        btnReserv.setText("jButton3");
+        btnReserv.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnReservaActionPerformed(evt);
+                btnReservActionPerformed(evt);
             }
         });
-        jDesktopPane1.add(btnReserva);
-        btnReserva.setBounds(920, 890, 130, 100);
+        jDesktopPane1.add(btnReserv);
+        btnReserv.setBounds(920, 890, 130, 100);
 
         jButton4.setText("jButton4");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -201,9 +201,9 @@ public class FrmMain extends javax.swing.JFrame {
         abrirInternal(frmEmpleado);
     }//GEN-LAST:event_btnEmpleadoActionPerformed
 
-    private void btnReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReservaActionPerformed
+    private void btnReservActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReservActionPerformed
         abrirInternal(frmReserva);
-    }//GEN-LAST:event_btnReservaActionPerformed
+    }//GEN-LAST:event_btnReservActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         abrirInternal(frmContratos);
@@ -238,6 +238,7 @@ public class FrmMain extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClientes;
     private javax.swing.JButton btnEmpleado;
+    private javax.swing.JButton btnReserv;
     private javax.swing.JButton btnVehiculos;
     private javax.swing.JButton jButton4;
     private javax.swing.JDesktopPane jDesktopPane1;
