@@ -20,38 +20,36 @@ public class Vehiculo {
     private TipoVehiculo tipo;
     private EstadoVehiculo estado;
 
-    public Vehiculo(String placa, String marca, String modelo, int anio, TipoVehiculo tipo, EstadoVehiculo estado) {
+    public Vehiculo(String placa, String marca, String modelo, int anio, TipoVehiculo tipo, EstadoVehiculo estado1) {
         this.placa = placa;
         this.marca = marca;
         this.modelo = modelo;
         this.anio = anio;
         this.tipo = tipo;
-        this.estado = estado;
+        this.estado = EstadoVehiculo.DISPONIBLE; // 👈 por defecto DISPONIBLE
     }
 
-    // Getters
+    // ===== Getters & Setters =====
     public String getPlaca() { return placa; }
-    public String getMarca() { return marca; }
-    public String getModelo() { return modelo; }
-    public int getAnio() { return anio; }
-    public TipoVehiculo getTipo() { return tipo; }
-    public EstadoVehiculo getEstado() { return estado; }
+    public void setPlaca(String placa) { this.placa = placa; }
 
-    // Setters
+    public String getMarca() { return marca; }
+    public void setMarca(String marca) { this.marca = marca; }
+
+    public String getModelo() { return modelo; }
     public void setModelo(String modelo) { this.modelo = modelo; }
+
+    public int getAnio() { return anio; }
+    public void setAnio(int anio) { this.anio = anio; }
+
+    public TipoVehiculo getTipo() { return tipo; }
     public void setTipo(TipoVehiculo tipo) { this.tipo = tipo; }
+
+    public EstadoVehiculo getEstado() { return estado; }
     public void setEstado(EstadoVehiculo estado) { this.estado = estado; }
 
     @Override
-    public boolean equals(Object o) {
-        return o instanceof Vehiculo v && placa != null && placa.equals(v.placa);
-    }
-    @Override
-    public int hashCode() { return Objects.hash(placa); }
-
-    @Override
     public String toString() {
-        return "Vehiculo{placa='%s', marca='%s', modelo='%s', anio=%d, tipo=%s, estado=%s}"
-                .formatted(placa, marca, modelo, anio, tipo, estado);
+        return placa + " - " + marca + " " + modelo + " (" + tipo + ")";
     }
 }

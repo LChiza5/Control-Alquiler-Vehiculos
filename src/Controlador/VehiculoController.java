@@ -4,6 +4,7 @@
  */
 package Controlador;
 
+import Controlador.ContratoController;
 import Lists.vehiculoList;
 import Modelo.Vehiculo;
 import Utils.EntidadNoEncontradaException;
@@ -11,6 +12,7 @@ import Utils.ReglaDeNegocioException;
 import Utils.UtilGUI;
 import Utils.Validators;
 import Vista.BuscarVehiculos;
+import Vista.FrmContratos;
 import Vista.FrmVehiculo;
 import javax.swing.SwingUtilities;
 
@@ -22,10 +24,11 @@ public class VehiculoController {
 
     private final vehiculoList repo;
     private final FrmVehiculo frm;
-
-    public VehiculoController(vehiculoList repo, FrmVehiculo frm) {
+    private FrmContratos frmContratos;
+    public VehiculoController(vehiculoList repo, FrmVehiculo frm, FrmContratos frmContratos) {
         this.repo = repo;
         this.frm = frm;
+        this.frmContratos = frmContratos;
         wireEvents();
     }
 
@@ -38,33 +41,42 @@ public class VehiculoController {
     }
 
     // Guardar
-    private void guardar() {
-        Vehiculo v = frm.getVehiculoFromForm();
-        if (v == null) {
-            UtilGUI.showErrorMessage(frm, "Datos incompletos", "Error");
+   private void guardar() {
+    Vehiculo v = frm.getVehiculoFromForm();
+    if (v == null) {
+        UtilGUI.showErrorMessage(frm, "Datos incompletos", "Error");
+        return;
+    }
+    try {
+        // Validaciones
+        Validators.noVacio(v.getPlaca(), "placa");
+        Validators.noVacio(v.getMarca(), "marca");
+        Validators.noVacio(v.getModelo(), "modelo");
+        Validators.anioVehiculoValido(v.getAnio(), 20);
+        if (v.getTipo() == null) throw new ReglaDeNegocioException("Debe seleccionar un tipo");
+        if (v.getEstado() == null) throw new ReglaDeNegocioException("Debe seleccionar un estado");
+
+        boolean ok = repo.add(v);
+        if (!ok) {
+            UtilGUI.showErrorMessage(frm, "No se pudo guardar (placa duplicada o inválida).", "Error");
             return;
         }
-        try {
-            // Validaciones
-            Validators.noVacio(v.getPlaca(), "placa");
-            Validators.noVacio(v.getMarca(), "marca");
-            Validators.noVacio(v.getModelo(), "modelo");
-            Validators.anioVehiculoValido(v.getAnio(), 20);
-            if (v.getTipo() == null) throw new ReglaDeNegocioException("Debe seleccionar un tipo");
-            if (v.getEstado() == null) throw new ReglaDeNegocioException("Debe seleccionar un estado");
 
-            boolean ok = repo.add(v);
-            if (!ok) {
-                UtilGUI.showErrorMessage(frm, "No se pudo guardar (placa duplicada o inválida).", "Error");
-                return;
-            }
-            UtilGUI.showMessage(frm, "Vehículo guardado", "OK");
-            frm.clearForm();
+        UtilGUI.showMessage(frm, "Vehículo guardado", "OK");
+        frm.clearForm();
 
-        } catch (ReglaDeNegocioException ex) {
-            UtilGUI.showErrorMessage(frm, ex.getMessage(), "Error de validación");
+        // 👇 Refrescar combo de placas en contratos si está disponible
+        if (frmContratos != null) {
+            frmContratos.setPlacas(
+                ContratoController.placasDisponibles(repo)
+            );
         }
+
+    } catch (ReglaDeNegocioException ex) {
+        UtilGUI.showErrorMessage(frm, ex.getMessage(), "Error de validación");
     }
+}
+    
 
     // Actualizar
     private void actualizar() {

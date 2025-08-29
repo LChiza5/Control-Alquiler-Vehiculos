@@ -258,6 +258,7 @@ public void clearForm() {
         txtTelefono = new javax.swing.JTextField();
 
         setBackground(new java.awt.Color(153, 153, 153));
+        setClosable(true);
 
         jPanel1.setBackground(new java.awt.Color(204, 204, 204));
 

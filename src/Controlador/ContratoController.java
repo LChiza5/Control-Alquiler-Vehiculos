@@ -76,39 +76,39 @@ public class ContratoController {
 
     /** Guardar: crea un contrato ad-hoc pidiendo tarifa diaria por input */
     private void guardarAdHoc() {
-        try {
-            String cedula = frm.getCedulaCliente();
-            String placa  = frm.getPlacaSeleccionada();
-            LocalDate ini = parse(frm.getFechaInicioText());
-            LocalDate fin = parse(frm.getFechaFinText());
+    try {
+        int idContrato = Integer.parseInt(frm.getNumeroContratoText()); // 👈 Leer el id
+        String cedula = frm.getCedulaCliente();
+        String placa  = frm.getPlacaSeleccionada();
+        LocalDate ini = parse(frm.getFechaInicioText());
+        LocalDate fin = parse(frm.getFechaFinText());
 
-            if (cedula.isBlank() || placa == null || placa.isBlank())
-                throw new ReglaDeNegocioException("Complete cédula y seleccione una placa.");
+        if (cedula.isBlank() || placa == null || placa.isBlank())
+            throw new ReglaDeNegocioException("Complete cédula y seleccione una placa.");
 
-            String s = JOptionPane.showInputDialog(frm, "Tarifa diaria:", "0");
-            if (s == null) return; // cancelado
-            double tarifa = Double.parseDouble(s);
+        String s = JOptionPane.showInputDialog(frm, "Tarifa diaria:", "0");
+        if (s == null) return; 
+        double tarifa = Double.parseDouble(s);
 
-            Contrato cto = gestor.crearAdHoc(cedula, placa, ini, fin, tarifa);
+        Contrato cto = gestor.crearAdHoc(idContrato, cedula, placa, ini, fin, tarifa); // 👈 ahora pasa el id
 
-            frm.setNumeroContrato(cto.getId());
-            frm.setMontoCalculado(String.valueOf(cto.getMonto()));
-            frm.setEstado(cto.getEstado().name());
+        frm.setNumeroContrato(cto.getId());
+        frm.setMontoCalculado(String.valueOf(cto.getMonto()));
+        frm.setEstado(cto.getEstado().name());
 
-            // refrescar combo de placas disponibles (el vehículo quedó EN_ALQUILER)
-            frm.setPlacas(placasDisponibles(repoVehiculos));
+        frm.setPlacas(placasDisponibles(repoVehiculos));
 
-            JOptionPane.showMessageDialog(frm,
-                    "Contrato #" + cto.getId() + " creado. Monto: " + cto.getMonto(),
-                    "OK", JOptionPane.INFORMATION_MESSAGE);
-        } catch (EntidadNoEncontradaException | ReglaDeNegocioException ex) {
-            JOptionPane.showMessageDialog(frm, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(frm, "Tarifa inválida.", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frm, "Datos inválidos o incompletos.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        JOptionPane.showMessageDialog(frm,
+                "Contrato #" + cto.getId() + " creado. Monto: " + cto.getMonto(),
+                "OK", JOptionPane.INFORMATION_MESSAGE);
+    } catch (EntidadNoEncontradaException | ReglaDeNegocioException ex) {
+        JOptionPane.showMessageDialog(frm, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(frm, "Tarifa inválida.", "Error", JOptionPane.ERROR_MESSAGE);
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(frm, "Datos inválidos o incompletos.", "Error", JOptionPane.ERROR_MESSAGE);
     }
+}
 
     /** Update: finaliza contrato ACTIVO y libera el vehículo */
     private void finalizar() {
@@ -172,7 +172,7 @@ public class ContratoController {
         return LocalDate.parse(s, fmt);
     }
 
-    private static List<String> placasDisponibles(vehiculoList repo) {
+    public static List<String> placasDisponibles(vehiculoList repo) {
         List<String> out = new ArrayList<>();
         for (Vehiculo v : repo.listar()) {
             if (v.getEstado() == EstadoVehiculo.DISPONIBLE) out.add(v.getPlaca());
@@ -188,20 +188,23 @@ public class ContratoController {
 
     // (Opcional) Si necesitas confirmar desde Reserva por UI en este form:
     public void crearDesdeReserva(int idReserva) {
-        try {
-            String s = JOptionPane.showInputDialog(frm, "Tarifa diaria:", "0");
-            if (s == null) return;
-            double tarifa = Double.parseDouble(s);
-            Contrato cto = gestor.crearDesdeReserva(idReserva, tarifa);
+    try {
+        String s = JOptionPane.showInputDialog(frm, "Tarifa diaria:", "0");
+        if (s == null) return;
+        double tarifa = Double.parseDouble(s);
 
-            frm.setContratoToForm(cto);
-            frm.setPlacas(placasDisponibles(repoVehiculos));
+        int idContrato = repoContratos.listar().size() + 1; // o leer de txtId1
 
-            JOptionPane.showMessageDialog(frm,
-                    "Contrato #" + cto.getId() + " creado desde reserva. Monto: " + cto.getMonto(),
-                    "OK", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frm, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        Contrato cto = gestor.crearDesdeReserva(idContrato, idReserva, tarifa); // 👈 pasando id
+
+        frm.setContratoToForm(cto);
+        frm.setPlacas(placasDisponibles(repoVehiculos));
+
+        JOptionPane.showMessageDialog(frm,
+                "Contrato #" + cto.getId() + " creado desde reserva. Monto: " + cto.getMonto(),
+                "OK", JOptionPane.INFORMATION_MESSAGE);
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(frm, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
+}
 }

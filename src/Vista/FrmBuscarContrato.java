@@ -239,7 +239,8 @@ public class FrmBuscarContrato extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-
+       contratoSeleccionado = null; // nada seleccionado
+    dispose(); // cerrar ventana
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void txtNombreenter(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreenter
@@ -247,7 +248,7 @@ public class FrmBuscarContrato extends javax.swing.JDialog {
     }//GEN-LAST:event_txtNombreenter
 
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
-
+      aceptar();
     }//GEN-LAST:event_btnAceptarActionPerformed
 
 

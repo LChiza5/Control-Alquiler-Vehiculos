@@ -76,7 +76,7 @@ public class FrmMain extends javax.swing.JFrame {
 
         // ===== Controladores =====
         controllerClientes   = new ClienteController(frmCliente, repoClientes);
-        controllerVehiculos  = new VehiculoController(repoVehiculos, frmVehiculo);
+        controllerVehiculos = new VehiculoController(repoVehiculos, frmVehiculo, frmContratos);
         controllerReservas   = new ReservaController(repoClientes, repoVehiculos, reservas, cola, frmReserva);
         controllerContratos  = new ContratoController(repoClientes, repoVehiculos, reservas, repoContratos, frmContratos);
         controllerEmpleados  = new EmpleadoController(repoEmpleados, frmEmpleado);
@@ -117,7 +117,7 @@ public class FrmMain extends javax.swing.JFrame {
         jDesktopPane1.add(jLabel1);
         jLabel1.setBounds(0, 60, 1980, 120);
 
-        btnClientes.setText("jButton1");
+        btnClientes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/cliente.png"))); // NOI18N
         btnClientes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnClientesActionPerformed(evt);
@@ -126,7 +126,7 @@ public class FrmMain extends javax.swing.JFrame {
         jDesktopPane1.add(btnClientes);
         btnClientes.setBounds(570, 890, 140, 100);
 
-        btnVehiculos.setText("jButton2");
+        btnVehiculos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/carro-deportivo (1).png"))); // NOI18N
         btnVehiculos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnVehiculosActionPerformed(evt);
@@ -135,7 +135,7 @@ public class FrmMain extends javax.swing.JFrame {
         jDesktopPane1.add(btnVehiculos);
         btnVehiculos.setBounds(750, 890, 130, 100);
 
-        btnReserv.setText("jButton3");
+        btnReserv.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/contratacion.png"))); // NOI18N
         btnReserv.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnReservActionPerformed(evt);
@@ -144,7 +144,7 @@ public class FrmMain extends javax.swing.JFrame {
         jDesktopPane1.add(btnReserv);
         btnReserv.setBounds(920, 890, 130, 100);
 
-        jButton4.setText("jButton4");
+        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/contrato.png"))); // NOI18N
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -153,7 +153,7 @@ public class FrmMain extends javax.swing.JFrame {
         jDesktopPane1.add(jButton4);
         jButton4.setBounds(1090, 890, 140, 100);
 
-        btnEmpleado.setText("jButton5");
+        btnEmpleado.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/applications_engineering (4).png"))); // NOI18N
         btnEmpleado.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEmpleadoActionPerformed(evt);
