@@ -33,6 +33,12 @@ public class Empleado extends Persona {
     }
 
     public void setPuesto(String puesto) { this.puesto = puesto; }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+    
+    
     
 
 }

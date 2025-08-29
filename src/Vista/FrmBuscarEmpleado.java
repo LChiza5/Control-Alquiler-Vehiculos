@@ -18,13 +18,13 @@ public class FrmBuscarEmpleado extends javax.swing.JInternalFrame {
     private empleadoList repo;
 private Consumer<Empleado> onSelect;
 
-// Llama a esto desde el Controller antes de mostrar el frame
+// Llamado por el controller antes de mostrar el frame
 public void setRepository(empleadoList repo) {
     this.repo = repo;
     refreshTable();
 }
 
-// El Controller te pasa qué hacer cuando el usuario seleccione un empleado
+// El controller te pasa qué hacer al seleccionar
 public void setOnSelect(Consumer<Empleado> onSelect) {
     this.onSelect = onSelect;
 }
@@ -40,7 +40,7 @@ public void refreshTable() {
 
     DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    for (Empleado e : repo.listar()) { // requiere getAll() en empleadoList (ver nota abajo)
+    for (Empleado e : repo.listar()) { // usa listar() de tu empleadoList
         m.addRow(new Object[]{
             e.getCedula(),
             e.getNombre(),
@@ -56,17 +56,21 @@ public void refreshTable() {
     tblEmpleados.setAutoCreateRowSorter(true); // ordenar por columnas
 }
 
-// --- Doble clic en la tabla para "devolver" el empleado seleccionado ---
-private void seleccionarDesdeTabla() {
+private Empleado getSelectedEmpleado() {
     int viewRow = tblEmpleados.getSelectedRow();
-    if (viewRow == -1) return;
+    if (viewRow == -1 || repo == null) return null;
 
     int modelRow = tblEmpleados.convertRowIndexToModel(viewRow);
-    String id = (String) tblEmpleados.getModel().getValueAt(modelRow, 0); // Columna 0 = ID
+    String id = (String) tblEmpleados.getModel().getValueAt(modelRow, 0); // col 0 = ID
+    return repo.find(id);
+}
 
-    if (repo != null && onSelect != null) {
-        Empleado emp = repo.find(id);
-        if (emp != null) onSelect.accept(emp);
+// --- Doble clic en la tabla para "devolver" el empleado seleccionado ---
+private void seleccionarDesdeTabla() {
+    Empleado emp = getSelectedEmpleado();
+    if (emp != null && onSelect != null) {
+        onSelect.accept(emp);
+        dispose(); // cerrar al doble clic
     }
 }
 
@@ -86,8 +90,36 @@ private void attachDoubleClick() {
      */
     public FrmBuscarEmpleado() {
         initComponents();
-        attachDoubleClick();
-    }
+       
+    setClosable(true);
+    setIconifiable(true);
+    setMaximizable(true);
+    setResizable(true);
+    setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+    // Selección única en la tabla
+    tblEmpleados.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+
+    // Doble clic (un SOLO listener centralizado)
+    attachDoubleClick();
+
+    // Botones
+    btnCancelar.addActionListener(e -> dispose());
+
+    btnAceptar.addActionListener(e -> {
+        if (onSelect == null) { dispose(); return; }
+        Empleado emp = getSelectedEmpleado();
+        if (emp == null) {
+            javax.swing.JOptionPane.showMessageDialog(
+                this, "Seleccione un empleado.", "Aviso",
+                javax.swing.JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+        onSelect.accept(emp);
+        dispose();
+    });
+}
 
     /**
      * This method is called from within the constructor to initialize the form.

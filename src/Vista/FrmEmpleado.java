@@ -29,24 +29,28 @@ public Modelo.Empleado getEmpleadoFromForm() {
     try {
         String id        = getTxtId().getText().trim();
         String nombre    = getTxtNombre().getText().trim();
+
         java.time.LocalDate nacimiento;
-    try {
-    String dateText = txtBirthdate.getText().replace("_","").trim();
-    nacimiento = java.time.LocalDate.parse(
-            dateText,
-            java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
-        );
-    } catch (java.time.format.DateTimeParseException ex) {
-    Utils.UtilGUI.showErrorMessage(this, "Fecha inválida. Use dd/MM/yyyy.", "Error");
-    return null;
-    }
+        try {
+            String dateText = txtBirthdate.getText().replace("_","").trim();
+            nacimiento = java.time.LocalDate.parse(
+                    dateText,
+                    java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            );
+        } catch (java.time.format.DateTimeParseException ex) {
+            Utils.UtilGUI.showErrorMessage(this, "Fecha inválida. Use dd/MM/yyyy.", "Error");
+            return null;
+        }
+
         String puesto    = (String) getCbPuesto().getSelectedItem();
         String salarioTx = getTxtSalario().getText().trim();
-        double salario   = salarioTx.isBlank()? 0.0 : Double.parseDouble(salarioTx);
+        String digits    = salarioTx.replaceAll("\\D", "");              // ← cambio
+        double salario   = digits.isEmpty() ? 0.0 : Double.parseDouble(digits); // ← cambio
         String correo    = getTxtCorreo().getText().trim();
         String telefono  = getTxtTelefono().getText().trim();
 
         return new Modelo.Empleado(id, nombre, nacimiento, telefono, correo, puesto, salario);
+
     } catch (NumberFormatException nfe) {
         Utils.UtilGUI.showErrorMessage(this, "Salario inválido (solo números).", "Error");
         return null;
@@ -58,26 +62,157 @@ public Modelo.Empleado getEmpleadoFromForm() {
 
 public void setEmpleadoToForm(Modelo.Empleado e) {
     if (e == null) return;
-    getTxtId().setText(e.getCedula());
-    getTxtNombre().setText(e.getNombre());
-    getTxtTelefono().setText(e.getTelefono());
-    getTxtCorreo().setText(e.getCorreo());
-    if (e.getPuesto()!=null) getCbPuesto().setSelectedItem(e.getPuesto());
-    getTxtSalario().setText(String.valueOf(e.getSalario()));
-    if (e.getFechaNac()!=null)
-        getTxtFechaNac().setText(e.getFechaNac().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-    else
+
+    // ID (si viene nulo/ vacío, dejamos los guiones de la máscara)
+    String ced = e.getCedula();
+    getTxtId().setText((ced == null || ced.isBlank()) ? "--" : ced);
+
+    // Nombre, Teléfono, Correo
+    getTxtNombre().setText(e.getNombre() == null ? "" : e.getNombre());
+    getTxtTelefono().setText(e.getTelefono() == null ? "" : e.getTelefono());
+    getTxtCorreo().setText(e.getCorreo() == null ? "" : e.getCorreo());
+
+    // Puesto (combo editable)
+    if (e.getPuesto() != null) {
+        getCbPuesto().setSelectedItem(e.getPuesto());
+    } else if (getCbPuesto().getItemCount() > 0) {
+        getCbPuesto().setSelectedIndex(0);
+    }
+
+    // Salario con separador de miles (punto)
+    java.text.DecimalFormatSymbols sym = new java.text.DecimalFormatSymbols();
+    sym.setGroupingSeparator('.');
+    java.text.DecimalFormat df = new java.text.DecimalFormat("#,###", sym);
+    long salLong = Math.round(e.getSalario()); // por si está en double
+    getTxtSalario().setText(df.format(salLong));
+
+    // Fecha de nacimiento (dd/MM/yyyy)
+    if (e.getFechaNac() != null) {
+        getTxtFechaNac().setText(
+            e.getFechaNac().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+        );
+    } else {
         getTxtFechaNac().setText("");
+    }
+}
+
+private void instalarMascaraCedula(javax.swing.JTextField field) {
+    javax.swing.text.AbstractDocument doc = (javax.swing.text.AbstractDocument) field.getDocument();
+    doc.setDocumentFilter(new javax.swing.text.DocumentFilter() {
+        private String soloDigitos(String s) { return s == null ? "" : s.replaceAll("\\D", ""); }
+
+        private String formatear(String digits) {
+            if (digits.length() > 9) digits = digits.substring(0, 9);
+            String p1 = digits.length() >= 1 ? digits.substring(0, 1) : "";
+            String p2 = digits.length() >= 2 ? digits.substring(1, Math.min(5, digits.length())) : "";
+            String p3 = digits.length() >= 6 ? digits.substring(5, Math.min(9, digits.length())) : "";
+            // Siempre mostramos los guiones, aunque falten dígitos
+            return p1 + "-" + p2 + "-" + p3;
+        }
+
+        private String recomponer(String actualConGuiones, int offset, String textoNuevo, int lengthToRemove) {
+            // 1) Tomar el contenido actual y quitar guiones
+            String actualDigits = soloDigitos(actualConGuiones);
+            // 2) Calcular cómo quedaría tras remover y luego insertar (en términos de dígitos)
+            //    Mapeo: posiciones visibles -> índice de dígitos (ignorando guiones)
+            StringBuilder visibles = new StringBuilder(actualConGuiones);
+            visibles.replace(offset, offset + lengthToRemove, textoNuevo == null ? "" : textoNuevo);
+            String futurosDigits = soloDigitos(visibles.toString());
+            // 3) Limitar a 9 dígitos y re-formatear
+            if (futurosDigits.length() > 9) futurosDigits = futurosDigits.substring(0, 9);
+            return formatear(futurosDigits);
+        }
+
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, javax.swing.text.AttributeSet attr)
+                throws javax.swing.text.BadLocationException {
+            String actual = fb.getDocument().getText(0, fb.getDocument().getLength());
+            String nuevo = recomponer(actual, offset, string, 0);
+            fb.replace(0, actual.length(), nuevo, attr);
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, javax.swing.text.AttributeSet attrs)
+                throws javax.swing.text.BadLocationException {
+            String actual = fb.getDocument().getText(0, fb.getDocument().getLength());
+            String nuevo = recomponer(actual, offset, text, length);
+            fb.replace(0, actual.length(), nuevo, attrs);
+        }
+
+        @Override
+        public void remove(FilterBypass fb, int offset, int length)
+                throws javax.swing.text.BadLocationException {
+            String actual = fb.getDocument().getText(0, fb.getDocument().getLength());
+            String nuevo = recomponer(actual, offset, "", length);
+            fb.replace(0, actual.length(), nuevo, null);
+        }
+    });
+
+    // Dejar los guiones visibles aunque esté vacío
+    field.setText("--");
+}
+
+// ==== Formato de miles "1.000.000" sobre un JTextField ====
+private void instalarFormatoMiles(javax.swing.JTextField field) {
+    final java.text.DecimalFormatSymbols sym = new java.text.DecimalFormatSymbols();
+    sym.setGroupingSeparator('.');   // separador de miles .
+    sym.setDecimalSeparator(',');    // (no usaremos decimales)
+    final java.text.DecimalFormat df = new java.text.DecimalFormat("#,###", sym);
+    df.setGroupingUsed(true);
+
+    javax.swing.text.AbstractDocument doc = (javax.swing.text.AbstractDocument) field.getDocument();
+    doc.setDocumentFilter(new javax.swing.text.DocumentFilter() {
+
+        private String onlyDigits(String s) { return s == null ? "" : s.replaceAll("\\D", ""); }
+
+        private String formatDigits(String digits) {
+            if (digits.isEmpty()) return "";
+            // hasta 12 dígitos por seguridad
+            if (digits.length() > 12) digits = digits.substring(0, 12);
+            long value = Long.parseLong(digits);
+            return df.format(value);
+        }
+
+        private String recompute(javax.swing.text.Document doc,
+                                 int offset, int length, String text) throws javax.swing.text.BadLocationException {
+            String current = doc.getText(0, doc.getLength());
+            StringBuilder sb = new StringBuilder(current);
+            sb.replace(offset, offset + length, text == null ? "" : text);
+            String digits = onlyDigits(sb.toString());
+            return formatDigits(digits);
+        }
+
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, javax.swing.text.AttributeSet attr)
+                throws javax.swing.text.BadLocationException {
+            String nuevo = recompute(fb.getDocument(), offset, 0, string);
+            fb.replace(0, fb.getDocument().getLength(), nuevo, attr);
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, javax.swing.text.AttributeSet attrs)
+                throws javax.swing.text.BadLocationException {
+            String nuevo = recompute(fb.getDocument(), offset, length, text);
+            fb.replace(0, fb.getDocument().getLength(), nuevo, attrs);
+        }
+
+        @Override
+        public void remove(FilterBypass fb, int offset, int length)
+                throws javax.swing.text.BadLocationException {
+            String nuevo = recompute(fb.getDocument(), offset, length, "");
+            fb.replace(0, fb.getDocument().getLength(), nuevo, null);
+        }
+    });
 }
 
 public void clearForm() {
-    getTxtId().setText("");
-    getTxtNombre().setText("");
-    getTxtFechaNac().setText("");
-    getCbPuesto().setSelectedIndex(0);
-    getTxtSalario().setText("");
-    getTxtCorreo().setText("");
-    getTxtTelefono().setText("");
+    txtId1.setText("--");                  
+    txtName1.setText("");
+    txtBirthdate.setText("");
+    if (txtPuesto1.getItemCount() > 0) txtPuesto1.setSelectedIndex(0);
+    txtSalario1.setText("");              
+    txtCorreo.setText("");
+    txtTelefono.setText("");
 }
         
     /**
@@ -85,6 +220,9 @@ public void clearForm() {
      */
     public FrmEmpleado() {
         initComponents();
+        instalarMascaraCedula(txtId1);
+        txtPuesto1.setEditable(true);
+        instalarFormatoMiles(txtSalario1);
     }
 
     /**
